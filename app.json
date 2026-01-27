@@ -1,0 +1,572 @@
+{
+  "expo": {
+    "name": "고스카",
+    "slug": "gosca",
+    "version": "3.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "gosca",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": [
+          "shinhan-sr-ansimclick",
+          "shinhan-sr-ansimclick-lpay",
+          "shinhan-sr-ansimclick-naverpay",
+          "shinhan-sr-ansimclick-payco",
+          "smshinhanansimclick",
+          "hdcardappcardansimclick",
+          "hyundaicardappcard",
+          "smhyundaiansimclick",
+          "mpointmallappcard",
+          "mpocket.online.ansimclick",
+          "monimopay",
+          "monimopayauth",
+          "scardcertiapp",
+          "cloudpay",
+          "nhappcardansimclick",
+          "nonghyupcardansimclick",
+          "kb-acp",
+          "kbbank",
+          "newliiv",
+          "lotteappcard",
+          "lottesmartpay",
+          "lpayapp",
+          "citispay",
+          "ispmobile",
+          "nhallonepayansimclick",
+          "citimobileapp",
+          "hanaskcardmobileportal",
+          "wooripay",
+          "com.wooricard.wcard",
+          "hanawalletmembers",
+          "NewSmartPib",
+          "kakaotalk",
+          "payco",
+          "shinsegaeeasypayment",
+          "tauthlink",
+          "ktauthexternalcall",
+          "upluscorporation",
+          "shinhan-sr-ansimclick",
+          "shinhan-sr-ansimclick-lpay",
+          "shinhan-sr-ansimclick-naverpay",
+          "shinhan-sr-ansimclick-payco",
+          "smshinhanansimclick",
+          "hdcardappcardansimclick",
+          "hyundaicardappcard",
+          "smhyundaiansimclick",
+          "mpointmallappcard",
+          "mpocket.online.ansimclick",
+          "monimopay",
+          "monimopayauth",
+          "scardcertiapp",
+          "cloudpay",
+          "nhappcardansimclick",
+          "nonghyupcardansimclick",
+          "kb-acp",
+          "kbbank",
+          "newliiv",
+          "lotteappcard",
+          "lottesmartpay",
+          "lpayapp",
+          "citispay",
+          "ispmobile",
+          "nhallonepayansimclick",
+          "citimobileapp",
+          "hanaskcardmobileportal",
+          "wooripay",
+          "com.wooricard.wcard",
+          "hanawalletmembers",
+          "NewSmartPib",
+          "kakaotalk",
+          "payco",
+          "shinsegaeeasypayment",
+          "tauthlink",
+          "ktauthexternalcall",
+          "upluscorporation"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "version": "3.0.1",
+      "buildNumber": "30",
+      "bundleIdentifier": "com.gosca.users"
+    },
+    "android": {
+      "version": "4.0.0",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundImage": "./assets/images/adaptive-icon.png"
+      },
+      "versionCode": 32,
+      "package": "com.user.gosca",
+      "permissions": ["INTERNET"],
+      "edgeToEdgeEnabled": true,
+      "packageVisibility": {
+        "queries": [
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "kakaotalk"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "kakaopay"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "kakaolink"
+              }
+            }
+          },
+          {
+            "scheme": "kakaotalk"
+          },
+          {
+            "scheme": "kakaopay"
+          },
+          {
+            "scheme": "kakaolink"
+          },
+          {
+            "package": "com.kakao.talk"
+          },
+          {
+            "package": "com.kakaopay.app"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "kakaobank"
+              }
+            }
+          },
+          {
+            "scheme": "kakaobank"
+          },
+          {
+            "package": "com.kakaobank.channel"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "ispmobile"
+              }
+            }
+          },
+          {
+            "scheme": "ispmobile"
+          },
+          {
+            "package": "kvp.jjy.MispAndroid320"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "app_card"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "kb-acp"
+              }
+            }
+          },
+          {
+            "scheme": "app_card"
+          },
+          {
+            "scheme": "kb-acp"
+          },
+          {
+            "package": "com.kbcard.cxh.appcard"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "hyundaicardappcard"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "hdcardappcardansimclick"
+              }
+            }
+          },
+          {
+            "scheme": "hyundaicardappcard"
+          },
+          {
+            "scheme": "hdcardappcardansimclick"
+          },
+          {
+            "package": "com.hyundaicard.appcard"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "smshinhanansimclick"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "shinhan-sr-ansimclick"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "shinhan-sr-ansimclick-payco"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "shinhan-sr-ansimclick-lpay"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "shinhan-sr-ansimclick-naverpay"
+              }
+            }
+          },
+          {
+            "scheme": "smshinhanansimclick"
+          },
+          {
+            "scheme": "shinhan-sr-ansimclick"
+          },
+          {
+            "scheme": "shinhan-sr-ansimclick-payco"
+          },
+          {
+            "scheme": "shinhan-sr-ansimclick-lpay"
+          },
+          {
+            "scheme": "shinhan-sr-ansimclick-naverpay"
+          },
+          {
+            "package": "com.shinhancard.smartshinhan"
+          },
+          {
+            "package": "com.shcard.smartpay"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "mpocket.online.ansimclick"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "monimopay"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "monimopayauth"
+              }
+            }
+          },
+          {
+            "scheme": "mpocket.online.ansimclick"
+          },
+          {
+            "scheme": "monimopay"
+          },
+          {
+            "scheme": "monimopayauth"
+          },
+          {
+            "package": "kr.co.samsungcard.mpocket"
+          },
+          {
+            "package": "net.ib.android.smcard"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "hanaskcardmobileportal"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "hanawalletmembers"
+              }
+            }
+          },
+          {
+            "scheme": "hanaskcardmobileportal"
+          },
+          {
+            "scheme": "hanawalletmembers"
+          },
+          {
+            "package": "com.hanaskcard.paycla"
+          },
+          {
+            "package": "kr.co.hanamembers.hmscustomer"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "wooripay"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "com.wooricard.wcard"
+              }
+            }
+          },
+          {
+            "scheme": "wooripay"
+          },
+          {
+            "scheme": "com.wooricard.wcard"
+          },
+          {
+            "package": "com.wooricard.smartapp"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "nhallonepayansimclick"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "nhappcardansimclick"
+              }
+            }
+          },
+          {
+            "scheme": "nhallonepayansimclick"
+          },
+          {
+            "scheme": "nhappcardansimclick"
+          },
+          {
+            "package": "nh.smart.nhallonepay"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "lpayapp"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "lottesmartpay"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "lotteappcard"
+              }
+            }
+          },
+          {
+            "scheme": "lpayapp"
+          },
+          {
+            "scheme": "lottesmartpay"
+          },
+          {
+            "scheme": "lotteappcard"
+          },
+          {
+            "package": "com.lcacApp"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "citimobileapp"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "citispay"
+              }
+            }
+          },
+          {
+            "scheme": "citimobileapp"
+          },
+          {
+            "scheme": "citispay"
+          },
+          {
+            "package": "kr.co.citibank.citimobile"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "payco"
+              }
+            }
+          },
+          {
+            "scheme": "payco"
+          },
+          {
+            "package": "com.nhnent.payapp"
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "tauthlink"
+              }
+            }
+          },
+          {
+            "intent": {
+              "action": "android.intent.action.VIEW",
+              "data": {
+                "scheme": "ktauthexternalcall"
+              }
+            }
+          },
+          {
+            "scheme": "tauthlink"
+          },
+          {
+            "scheme": "ktauthexternalcall"
+          },
+          {
+            "package": "com.sktelecom.tauth"
+          },
+          {
+            "package": "com.kt.ktauth"
+          },
+          {
+            "package": "com.kt.ktauthp"
+          },
+          {
+            "package": "com.kftc.bankpay.android"
+          },
+          {
+            "package": "com.samsung.android.spay"
+          },
+          {
+            "package": "com.samsung.android.spaylite"
+          },
+          {
+            "package": "com.kbstar.kbbank"
+          },
+          {
+            "package": "com.kbstar.liivbank"
+          },
+          {
+            "package": "com.kbstar.reboot"
+          },
+          {
+            "package": "com.lumensoft.touchenappfree"
+          },
+          {
+            "package": "com.TouchEn.mVaccine.webs"
+          },
+          {
+            "package": "com.ahnlab.v3mobileplus"
+          },
+          {
+            "package": "kr.co.shiftworks.vguardweb"
+          }
+        ]
+      }
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#0E50C3",
+          "dark": {
+            "backgroundColor": "#0E50C3"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "91a480b9-66c4-424d-b871-7a91f88b0665"
+      }
+    }
+  }
+}
