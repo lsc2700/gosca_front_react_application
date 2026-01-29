@@ -36,7 +36,7 @@ interface navType {
 //   };
 // }
 
-const url = "https://apis.gosca.co.kr/storeLists/gosca";
+const url = "https://apis.gosca.co.kr/login/gosca";
 
 export default function App() {
   const deviceHeight = Dimensions.get("window").height;
@@ -63,7 +63,7 @@ export default function App() {
     Alert.alert("종료하시겠어요?", "확인을 누르면 종료합니다.", [
       {
         text: "취소",
-        onPress: () => { },
+        onPress: () => {},
         style: "cancel",
       },
       { text: "확인", onPress: () => BackHandler.exitApp() },
@@ -86,7 +86,7 @@ export default function App() {
 
     const subscription = BackHandler.addEventListener(
       "hardwareBackPress",
-      handleBackButton
+      handleBackButton,
     );
 
     return () => {
@@ -133,7 +133,7 @@ export default function App() {
       forceHttps("https://www.gosca.co.kr/login");
       return false; // WebView가 http 로드 못 하게 차단
     }
-    
+
     if (Platform.OS === "ios") {
       const scheme = url.split(":")[0] + "://"; // URL의 스킴 추출
       if (iosSchemes.includes(scheme)) {
@@ -143,7 +143,7 @@ export default function App() {
             console.error("URL 열기에 실패함:", err);
             Alert.alert(
               "앱이 설치되어 있지 않습니다,",
-              " 앱 설치 후 다시 시도해주세요."
+              " 앱 설치 후 다시 시도해주세요.",
             );
           });
 
@@ -152,22 +152,26 @@ export default function App() {
         return true;
       }
     } else if (Platform.OS === "android") {
-      if (url.startsWith('intent:')) {
+      if (url.startsWith("intent:")) {
         const cvt = new ConvertUrl(url);
-        cvt.launchApp().catch(() => { });
+        cvt.launchApp().catch(() => {});
         return false; // WebView 로드 금지
       }
 
-      const NON_HTTP = /^(tel|mailto|sms|geo|kakaotalk|kakaopay|ispmobile|hdcardappcardansimclick|shinhan-sr-ansimclick|kb-acp|nhappcardansimclick|nhallonepayansimclick|lpayapp|payco|citispay|hanawalletmembers|cloudpay|mpocket\.online\.ansimclick|kftc-bankpay|supertoss|kbbank|liivbank|newliiv|wooripay|citimobileapp|kakaobank):/i;
+      const NON_HTTP =
+        /^(tel|mailto|sms|geo|kakaotalk|kakaopay|ispmobile|hdcardappcardansimclick|shinhan-sr-ansimclick|kb-acp|nhappcardansimclick|nhallonepayansimclick|lpayapp|payco|citispay|hanawalletmembers|cloudpay|mpocket\.online\.ansimclick|kftc-bankpay|supertoss|kbbank|liivbank|newliiv|wooripay|citimobileapp|kakaobank):/i;
       // 2) 카드/은행 등 비-HTTP 스킴 → 외부 앱으로
       if (NON_HTTP.test(url)) {
-        Linking.openURL(url).catch(() => { });
+        Linking.openURL(url).catch(() => {});
         return false;
       }
 
       // 3) 마켓 링크 → 외부로
-      if (url.startsWith('market://') || url.includes('play.google.com/store/apps')) {
-        Linking.openURL(url).catch(() => { });
+      if (
+        url.startsWith("market://") ||
+        url.includes("play.google.com/store/apps")
+      ) {
+        Linking.openURL(url).catch(() => {});
         return false;
       }
 
@@ -332,7 +336,7 @@ export default function App() {
             setNavState({ url: nav.url, canGoBack: nav.canGoBack });
           }}
           onContentProcessDidTerminate={() => {
-            if (Platform.OS === 'android') {
+            if (Platform.OS === "android") {
               webviewRef.current?.reload();
             }
           }}
