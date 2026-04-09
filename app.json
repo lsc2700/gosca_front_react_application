@@ -101,7 +101,11 @@
       },
       "versionCode": 32,
       "package": "com.user.gosca",
-      "permissions": ["INTERNET"],
+      "permissions": [
+        "INTERNET",
+        "POST_NOTIFICATIONS",
+        "VIBRATE"
+      ],
       "edgeToEdgeEnabled": true,
       "packageVisibility": {
         "queries": [
@@ -545,6 +549,13 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#0E50C3"
+        }
+      ],
       [
         "expo-splash-screen",
         {

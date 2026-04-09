@@ -14,6 +14,7 @@ import WebView from "react-native-webview";
 import { ConvertUrl } from "@tosspayments/widget-sdk-react-native/src/utils/convertUrl";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { iosSchemes } from "./constants/iosSchemes";
+import { setupAppNotifications } from "./utils/setupNotifications";
 
 interface navType {
   url: string;
@@ -58,6 +59,10 @@ export default function App() {
     url: "",
     canGoBack: false,
   });
+
+  useEffect(() => {
+    void setupAppNotifications().catch(() => {});
+  }, []);
 
   const close = () => {
     Alert.alert("종료하시겠어요?", "확인을 누르면 종료합니다.", [
