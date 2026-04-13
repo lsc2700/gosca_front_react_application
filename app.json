@@ -2,7 +2,7 @@
   "expo": {
     "name": "고스카",
     "slug": "gosca",
-    "version": "3.1.1",
+    "version": "4.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "gosca",
@@ -94,7 +94,7 @@
       "bundleIdentifier": "com.gosca.users"
     },
     "android": {
-      "version": "4.0.0",
+      "version": "4.1.1",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundImage": "./assets/images/adaptive-icon.png"
