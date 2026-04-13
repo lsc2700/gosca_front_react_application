@@ -1,5 +1,6 @@
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as Location from "expo-location";
+import * as Notifications from "expo-notifications";
 import { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -14,7 +15,11 @@ import WebView from "react-native-webview";
 import { ConvertUrl } from "@tosspayments/widget-sdk-react-native/src/utils/convertUrl";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { iosSchemes } from "./constants/iosSchemes";
-import { setupAppNotifications } from "./utils/setupNotifications";
+import { injectNativeFcmIntoWebView } from "./utils/injectNativeFcmToken";
+import {
+  fetchDevicePushToken,
+  setupAppNotifications,
+} from "./utils/setupNotifications";
 
 interface navType {
   url: string;
@@ -43,6 +48,7 @@ export default function App() {
   const deviceHeight = Dimensions.get("window").height;
   const deviceWidth = Dimensions.get("window").width;
   const webviewRef = useRef<WebView>(null);
+  const devicePushTokenRef = useRef<string | null>(null);
   // const [location, setLocation] = useState<locationData>({
   //   platform: Platform.OS,
   //   accuracy: null,
@@ -61,7 +67,32 @@ export default function App() {
   });
 
   useEffect(() => {
-    void setupAppNotifications().catch(() => {});
+    let tokenSub: { remove: () => void } | undefined;
+
+    void (async () => {
+      try {
+        await setupAppNotifications();
+        const token = await fetchDevicePushToken();
+        if (token) {
+          devicePushTokenRef.current = token;
+          injectNativeFcmIntoWebView(webviewRef.current, token);
+        }
+      } catch {
+        /* noop */
+      }
+    })();
+
+    tokenSub = Notifications.addPushTokenListener((t) => {
+      const next = typeof t.data === "string" && t.data.length > 0 ? t.data : null;
+      if (next) {
+        devicePushTokenRef.current = next;
+        injectNativeFcmIntoWebView(webviewRef.current, next);
+      }
+    });
+
+    return () => {
+      tokenSub?.remove();
+    };
   }, []);
 
   const close = () => {
@@ -344,6 +375,12 @@ export default function App() {
             if (Platform.OS === "android") {
               webviewRef.current?.reload();
             }
+          }}
+          onLoadEnd={() => {
+            injectNativeFcmIntoWebView(
+              webviewRef.current,
+              devicePushTokenRef.current,
+            );
           }}
         />
       </View>

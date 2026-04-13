@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "655511009211",
+    "project_id": "gosca-fcm",
+    "storage_bucket": "gosca-fcm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:655511009211:android:bf626576b4c0edd938369e",
+        "android_client_info": {
+          "package_name": "com.kaldoo.goscaadmin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXaRC45pqetk0LpLx7Elb0HpwZRL6V1Xo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:655511009211:android:33c927f833e29f0838369e",
+        "android_client_info": {
+          "package_name": "com.user.gosca"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXaRC45pqetk0LpLx7Elb0HpwZRL6V1Xo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
