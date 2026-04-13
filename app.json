@@ -90,7 +90,7 @@
         "ITSAppUsesNonExemptEncryption": false
       },
       "version": "4.1.1",
-      "buildNumber": "30",
+      "buildNumber": "31",
       "bundleIdentifier": "com.gosca.users"
     },
     "android": {
@@ -99,7 +99,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundImage": "./assets/images/adaptive-icon.png"
       },
-      "versionCode": 32,
+      "versionCode": 33,
       "package": "com.user.gosca",
       "permissions": ["INTERNET", "POST_NOTIFICATIONS", "VIBRATE"],
       "edgeToEdgeEnabled": true,
