@@ -575,7 +575,8 @@
             "useFrameworks": "static"
           }
         }
-      ]
+      ],
+      "./plugins/withRNFBNonModularHeaders.js"
     ],
     "experiments": {
       "typedRoutes": true,
