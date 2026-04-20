@@ -1,6 +1,6 @@
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as Location from "expo-location";
-import * as Notifications from "expo-notifications";
+import messaging from "@react-native-firebase/messaging";
 import { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -67,7 +67,7 @@ export default function App() {
   });
 
   useEffect(() => {
-    let tokenSub: { remove: () => void } | undefined;
+    let tokenRefreshUnsub: (() => void) | undefined;
 
     void (async () => {
       try {
@@ -82,16 +82,15 @@ export default function App() {
       }
     })();
 
-    tokenSub = Notifications.addPushTokenListener((t) => {
-      const next = typeof t.data === "string" && t.data.length > 0 ? t.data : null;
-      if (next) {
+    tokenRefreshUnsub = messaging().onTokenRefresh((next) => {
+      if (typeof next === "string" && next.length > 0) {
         devicePushTokenRef.current = next;
         injectNativeFcmIntoWebView(webviewRef.current, next);
       }
     });
 
     return () => {
-      tokenSub?.remove();
+      tokenRefreshUnsub?.();
     };
   }, []);
 
