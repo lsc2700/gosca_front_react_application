@@ -1,3 +1,4 @@
+import messaging from "@react-native-firebase/messaging";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
@@ -28,13 +29,24 @@ export async function setupAppNotifications(): Promise<void> {
 }
 
 /**
- * Android: FCM 등록 토큰. iOS: 기기 푸시 토큰(백엔드가 FCM만 받으면 iOS 별도 검증 필요).
- * Expo Go가 아닌 dev client / 스토어 빌드 + Firebase(google-services.json) 설정 필요.
+ * FCM 등록 토큰 (Android·iOS 공통). 네이티브 빌드 + google-services / GoogleService-Info 필요.
+ * RN Firebase 미포함 빌드에서는 expo-notifications 토큰으로 폴백.
  */
 export async function fetchDevicePushToken(): Promise<string | null> {
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== "granted") {
     return null;
+  }
+  try {
+    if (Platform.OS === "ios") {
+      await messaging().registerDeviceForRemoteMessages();
+    }
+    const fcm = await messaging().getToken();
+    if (typeof fcm === "string" && fcm.length > 0) {
+      return fcm;
+    }
+  } catch {
+    /* fall through */
   }
   try {
     const push = await Notifications.getDevicePushTokenAsync();

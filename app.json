@@ -103,7 +103,11 @@
       },
       "versionCode": 34,
       "package": "com.user.gosca",
-      "permissions": ["INTERNET", "POST_NOTIFICATIONS", "VIBRATE"],
+      "permissions": [
+        "INTERNET",
+        "POST_NOTIFICATIONS",
+        "VIBRATE"
+      ],
       "edgeToEdgeEnabled": true,
       "packageVisibility": {
         "queries": [
@@ -563,6 +567,16 @@
           "backgroundColor": "#0E50C3",
           "dark": {
             "backgroundColor": "#0E50C3"
+          }
+        }
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
           }
         }
       ]
