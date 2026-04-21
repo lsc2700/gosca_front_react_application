@@ -359,6 +359,10 @@ export default function App() {
           mixedContentMode="always"
           sharedCookiesEnabled={true}
           thirdPartyCookiesEnabled={true}
+          mediaPlaybackRequiresUserAction={false}
+          {...(Platform.OS === "ios"
+            ? { allowsInlineMediaPlayback: true as const }
+            : {})}
           onMessage={async (event) => {
             try {
               const raw = event.nativeEvent.data;
