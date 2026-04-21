@@ -15,3 +15,11 @@ export function injectNativeFcmIntoWebView(
   }
   wv.injectJavaScript(buildInjectNativeFcmTokenScript(token));
 }
+
+/** 웹 `requestUserNotificationPermission` — `goscaNativeNotificationPermission` 수신 */
+export function buildInjectNotificationPermissionResultScript(
+  granted: boolean,
+): string {
+  const detail = JSON.stringify({ granted });
+  return `(function(){try{window.dispatchEvent(new CustomEvent('goscaNativeNotificationPermission',{detail:${detail}}));}catch(e){}})();true;`;
+}

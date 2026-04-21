@@ -15,9 +15,13 @@ import WebView from "react-native-webview";
 import { ConvertUrl } from "@tosspayments/widget-sdk-react-native/src/utils/convertUrl";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { iosSchemes } from "./constants/iosSchemes";
-import { injectNativeFcmIntoWebView } from "./utils/injectNativeFcmToken";
+import {
+  buildInjectNotificationPermissionResultScript,
+  injectNativeFcmIntoWebView,
+} from "./utils/injectNativeFcmToken";
 import {
   fetchDevicePushToken,
+  requestExpoNotificationPermission,
   setupAppNotifications,
 } from "./utils/setupNotifications";
 
@@ -355,7 +359,62 @@ export default function App() {
           mixedContentMode="always"
           sharedCookiesEnabled={true}
           thirdPartyCookiesEnabled={true}
-          // onMessage={onMessage}
+          onMessage={async (event) => {
+            try {
+              const raw = event.nativeEvent.data;
+              let parsed: { type?: string } = {};
+              try {
+                parsed = JSON.parse(raw) as { type?: string };
+              } catch {
+                return;
+              }
+              if (parsed.type === "GOSCA_REQUEST_NATIVE_FCM") {
+                injectNativeFcmIntoWebView(
+                  webviewRef.current,
+                  devicePushTokenRef.current,
+                );
+                return;
+              }
+              if (parsed.type === "GOSCA_REQUEST_NOTIFICATION_PERMISSION") {
+                let granted = false;
+                try {
+                  granted = await requestExpoNotificationPermission();
+                } catch {
+                  granted = false;
+                }
+                if (granted) {
+                  try {
+                    const t = await fetchDevicePushToken();
+                    if (t) {
+                      devicePushTokenRef.current = t;
+                      injectNativeFcmIntoWebView(webviewRef.current, t);
+                    }
+                  } catch {
+                    /* noop */
+                  }
+                } else {
+                  Alert.alert(
+                    "알림을 허용해 주세요",
+                    "알림을 허용하지 않으면 이 기기에서는 푸시 알림을 받을 수 없습니다.",
+                    [
+                      { text: "취소", style: "cancel" },
+                      {
+                        text: "설정으로 이동",
+                        onPress: () => {
+                          void Linking.openSettings();
+                        },
+                      },
+                    ],
+                  );
+                }
+                webviewRef.current?.injectJavaScript(
+                  buildInjectNotificationPermissionResultScript(granted),
+                );
+              }
+            } catch {
+              /* noop */
+            }
+          }}
           onError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
             console.warn("WebView error: ", nativeEvent);
