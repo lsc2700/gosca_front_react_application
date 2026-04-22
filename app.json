@@ -2,7 +2,7 @@
   "expo": {
     "name": "고스카",
     "slug": "gosca",
-    "version": "4.1.3",
+    "version": "4.1.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "gosca",
@@ -90,18 +90,18 @@
         ],
         "ITSAppUsesNonExemptEncryption": false
       },
-      "version": "4.1.3",
-      "buildNumber": "35",
+      "version": "4.1.4",
+      "buildNumber": "36",
       "bundleIdentifier": "com.gosca.users"
     },
     "android": {
-      "version": "4.1.3",
+      "version": "4.1.4",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundImage": "./assets/images/adaptive-icon.png"
       },
-      "versionCode": 35,
+      "versionCode": 36,
       "package": "com.user.gosca",
       "permissions": ["INTERNET", "POST_NOTIFICATIONS", "VIBRATE"],
       "edgeToEdgeEnabled": true,
