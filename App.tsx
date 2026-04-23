@@ -24,6 +24,7 @@ import {
   requestExpoNotificationPermission,
   setupAppNotifications,
 } from "./utils/setupNotifications";
+import { presentFcmForegroundLocalNotification } from "./utils/fcmLocalPresentation";
 
 interface navType {
   url: string;
@@ -93,8 +94,17 @@ export default function App() {
       }
     });
 
+    const msgUnsub = messaging().onMessage(async (remoteMessage) => {
+      try {
+        await presentFcmForegroundLocalNotification(remoteMessage);
+      } catch {
+        /* noop */
+      }
+    });
+
     return () => {
       tokenRefreshUnsub?.();
+      msgUnsub();
     };
   }, []);
 

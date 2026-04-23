@@ -11,22 +11,34 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function ensureAndroidDefaultChannel(): Promise<void> {
+/** FCM `AndroidNotification.channelId` / data.category 와 동일 ID (fcm-service 기준) */
+async function ensureAndroidFcmChannels(): Promise<void> {
   if (Platform.OS !== "android") {
     return;
   }
-  await Notifications.setNotificationChannelAsync("default", {
-    name: "고스카 알림",
+  const high = {
     importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: [0, 250, 250, 250],
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
-    sound: "default",
+    sound: "default" as const,
+  };
+  await Notifications.setNotificationChannelAsync("default", {
+    name: "고스카 알림",
+    ...high,
+  });
+  await Notifications.setNotificationChannelAsync("gosca_chat", {
+    name: "채팅",
+    ...high,
+  });
+  await Notifications.setNotificationChannelAsync("gosca_booking", {
+    name: "예약·일정",
+    ...high,
   });
 }
 
 /** WebView에서 재요청할 때 사용 — OS 알림 권한 시트 */
 export async function requestExpoNotificationPermission(): Promise<boolean> {
-  await ensureAndroidDefaultChannel();
+  await ensureAndroidFcmChannels();
   const cur = await Notifications.getPermissionsAsync();
   if (cur.status === "granted") {
     return true;
@@ -36,7 +48,7 @@ export async function requestExpoNotificationPermission(): Promise<boolean> {
 }
 
 export async function setupAppNotifications(): Promise<void> {
-  await ensureAndroidDefaultChannel();
+  await ensureAndroidFcmChannels();
 
   const { status: existing } = await Notifications.getPermissionsAsync();
   if (existing !== "granted") {
