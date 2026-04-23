@@ -24,6 +24,7 @@ import {
   requestExpoNotificationPermission,
   setupAppNotifications,
 } from "./utils/setupNotifications";
+import { displayGroupedAndroidNotification } from "./utils/groupedNotifications";
 
 interface navType {
   url: string;
@@ -72,6 +73,7 @@ export default function App() {
 
   useEffect(() => {
     let tokenRefreshUnsub: (() => void) | undefined;
+    let foregroundMessageUnsub: (() => void) | undefined;
 
     void (async () => {
       try {
@@ -93,8 +95,13 @@ export default function App() {
       }
     });
 
+    foregroundMessageUnsub = messaging().onMessage(async (remoteMessage) => {
+      await displayGroupedAndroidNotification(remoteMessage);
+    });
+
     return () => {
       tokenRefreshUnsub?.();
+      foregroundMessageUnsub?.();
     };
   }, []);
 
