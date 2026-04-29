@@ -24,6 +24,14 @@ async function ensureAndroidChannels(): Promise<void> {
       sound: "default",
       showBadge: true,
     }),
+    Notifications.setNotificationChannelAsync("gosca_admin", {
+      name: "관리자 메시지",
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      sound: "default",
+      showBadge: true,
+    }),
     Notifications.setNotificationChannelAsync("gosca_chat", {
       name: "채팅 알림",
       importance: Notifications.AndroidImportance.HIGH,
@@ -32,8 +40,16 @@ async function ensureAndroidChannels(): Promise<void> {
       sound: "default",
       showBadge: true,
     }),
-    Notifications.setNotificationChannelAsync("gosca_booking", {
-      name: "예약 알림",
+    Notifications.setNotificationChannelAsync("gosca_purchase", {
+      name: "이용권·룸·사물함 구매",
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      sound: "default",
+      showBadge: true,
+    }),
+    Notifications.setNotificationChannelAsync("gosca_usage", {
+      name: "좌석·사물함 이용",
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,

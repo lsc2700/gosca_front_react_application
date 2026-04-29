@@ -4,9 +4,15 @@ import notifee, { AndroidImportance, AndroidStyle } from "@notifee/react-native"
 import { Platform } from "react-native";
 
 const GROUP_COUNT_KEY_PREFIX = "gosca_group_count:";
-const GROUP_KIND_LABEL: Record<string, string> = {
-  booking: "구매/예약 알림",
+
+/** 서버 FcmPushService.resolveAndroidChannelId 와 동일한 분류(표시용 라벨만 앱에서 한글화) */
+type GroupKind = "admin" | "chat" | "purchase" | "usage" | "default";
+
+const GROUP_KIND_LABEL: Record<GroupKind, string> = {
+  admin: "관리자 메시지",
   chat: "채팅 알림",
+  purchase: "이용권·룸·사물함 구매",
+  usage: "좌석·사물함 이용",
   default: "알림",
 };
 
@@ -65,15 +71,47 @@ function buildAndroidChildStyle(body: string):
   return { type: AndroidStyle.BIGTEXT, text: body };
 }
 
-function normalizeKind(msg: FirebaseMessagingTypes.RemoteMessage): "booking" | "chat" | "default" {
+function normalizeKind(msg: FirebaseMessagingTypes.RemoteMessage): GroupKind {
   const raw = (msg.data?.type ?? "").toUpperCase();
   if (raw.includes("CHAT") || raw.includes("MESSAGE") || raw.includes("DM")) {
     return "chat";
   }
-  if (raw.includes("BOOK") || raw.includes("RESERV") || raw.includes("SCHEDULE") || raw.includes("예약")) {
-    return "booking";
+  if (raw.includes("MASTER_BROADCAST") || raw.startsWith("MASTER_")) {
+    return "admin";
+  }
+  if (
+    raw.includes("SEAT_EXIT") ||
+    raw.includes("SEAT_USE_START") ||
+    raw.includes("LOCKER_USE_START")
+  ) {
+    return "usage";
+  }
+  if (
+    raw.includes("PASS_PURCHASE") ||
+    raw.includes("STUDY_ROOM_PURCHASE") ||
+    raw.includes("BOOK") ||
+    raw.includes("RESERV") ||
+    raw.includes("SCHEDULE") ||
+    raw.includes("예약")
+  ) {
+    return "purchase";
   }
   return "default";
+}
+
+function channelIdForKind(kind: GroupKind): string {
+  switch (kind) {
+    case "admin":
+      return "gosca_admin";
+    case "chat":
+      return "gosca_chat";
+    case "purchase":
+      return "gosca_purchase";
+    case "usage":
+      return "gosca_usage";
+    default:
+      return "default";
+  }
 }
 
 function groupKeyOf(msg: FirebaseMessagingTypes.RemoteMessage): string {
@@ -109,6 +147,13 @@ export async function ensureNotifeeChannels(): Promise<void> {
     badge: true,
   });
   await notifee.createChannel({
+    id: "gosca_admin",
+    name: "관리자 메시지",
+    importance: AndroidImportance.HIGH,
+    vibration: true,
+    badge: true,
+  });
+  await notifee.createChannel({
     id: "gosca_chat",
     name: "채팅 알림",
     importance: AndroidImportance.HIGH,
@@ -116,8 +161,15 @@ export async function ensureNotifeeChannels(): Promise<void> {
     badge: true,
   });
   await notifee.createChannel({
-    id: "gosca_booking",
-    name: "구매/예약 알림",
+    id: "gosca_purchase",
+    name: "이용권·룸·사물함 구매",
+    importance: AndroidImportance.HIGH,
+    vibration: true,
+    badge: true,
+  });
+  await notifee.createChannel({
+    id: "gosca_usage",
+    name: "좌석·사물함 이용",
     importance: AndroidImportance.HIGH,
     vibration: true,
     badge: true,
@@ -135,7 +187,7 @@ export async function displayGroupedAndroidNotification(
 
   const groupKey = groupKeyOf(msg);
   const groupKind = normalizeKind(msg);
-  const channelId = groupKind === "chat" ? "gosca_chat" : groupKind === "booking" ? "gosca_booking" : "default";
+  const channelId = channelIdForKind(groupKind);
   const count = await nextGroupCount(groupKey);
   const childId = msg.messageId ?? `${Date.now()}`;
   const summaryId = `summary:${groupKey}`;
