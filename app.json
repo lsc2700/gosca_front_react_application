@@ -92,18 +92,18 @@
         "NSPhotoLibraryAddUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다."
       },
-      "version": "4.1.5",
-      "buildNumber": "37",
+      "version": "4.1.6",
+      "buildNumber": "38",
       "bundleIdentifier": "com.gosca.users"
     },
     "android": {
-      "version": "4.1.5",
+      "version": "4.1.6",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundImage": "./assets/images/adaptive-icon.png"
       },
-      "versionCode": 37,
+      "versionCode": 38,
       "package": "com.user.gosca",
       "permissions": [
         "INTERNET",
