@@ -2,7 +2,7 @@
   "expo": {
     "name": "고스카",
     "slug": "gosca",
-    "version": "4.1.5",
+    "version": "4.1.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "gosca",
