@@ -25,6 +25,7 @@ import {
   setupAppNotifications,
 } from "./utils/setupNotifications";
 import { displayGroupedAndroidNotification } from "./utils/groupedNotifications";
+import { shareReceiptImageFromWebPayload } from "./utils/shareReceiptImageNative";
 
 interface navType {
   url: string;
@@ -377,6 +378,24 @@ export default function App() {
               try {
                 parsed = JSON.parse(raw) as { type?: string };
               } catch {
+                return;
+              }
+              if (parsed.type === "GOSCA_SHARE_RECEIPT_IMAGE") {
+                const p = parsed as {
+                  type: string;
+                  base64?: string;
+                  filename?: string;
+                };
+                const b64 = p.base64;
+                const fn = p.filename;
+                if (typeof b64 === "string" && b64.length > 20) {
+                  void shareReceiptImageFromWebPayload(b64, fn ?? "").catch(() => {
+                    Alert.alert(
+                      "오류",
+                      "영수증을 공유할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+                    );
+                  });
+                }
                 return;
               }
               if (parsed.type === "GOSCA_REQUEST_NATIVE_FCM") {
