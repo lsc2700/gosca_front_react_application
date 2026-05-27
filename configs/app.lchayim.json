@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "고스카",
-    "slug": "gosca",
+    "name": "르하임 스터디카페",
+    "slug": "lchayim",
     "version": "4.1.7",
     "orientation": "portrait",
-    "icon": "./assets/gosca/icon.png",
-    "scheme": "gosca",
+    "icon": "./assets/lchayim/icon.png",
+    "scheme": "lchayim",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -94,17 +94,17 @@
       },
       "version": "4.1.7",
       "buildNumber": "42",
-      "bundleIdentifier": "com.gosca.users"
+      "bundleIdentifier": "com.kaldoo.lchayim"
     },
     "android": {
       "version": "4.1.7",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/gosca/adaptive-icon.png",
-        "backgroundImage": "./assets/gosca/adaptive-icon.png"
+        "foregroundImage": "./assets/lchayim/adaptive-icon.png",
+        "backgroundImage": "./assets/lchayim/adaptive-icon.png"
       },
       "versionCode": 42,
-      "package": "com.gosca.users",
+      "package": "com.kaldoo.lchayim",
       "permissions": [
         "INTERNET",
         "POST_NOTIFICATIONS",
@@ -551,7 +551,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/gosca/favicon.png"
+      "favicon": "./assets/lchayim/favicon.png"
     },
     "plugins": [
       "expo-router",
@@ -566,19 +566,19 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/gosca/icon.png",
+          "icon": "./assets/lchayim/icon.png",
           "color": "#0E50C3"
         }
       ],
       [
         "expo-splash-screen",
         {
-          "image": "./assets/gosca/splash-icon.png",
+          "image": "./assets/lchayim/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#0E50C3",
+          "backgroundColor": "#000000",
           "dark": {
-            "backgroundColor": "#0E50C3"
+            "backgroundColor": "#000000"
           }
         }
       ],

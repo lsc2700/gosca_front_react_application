@@ -15,6 +15,7 @@ import WebView from "react-native-webview";
 import { ConvertUrl } from "@tosspayments/widget-sdk-react-native/src/utils/convertUrl";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { iosSchemes } from "./constants/iosSchemes";
+import { displayGroupedAndroidNotification } from "./utils/groupedNotifications";
 import {
   buildInjectNotificationPermissionResultScript,
   injectNativeFcmIntoWebView,
@@ -24,7 +25,6 @@ import {
   requestExpoNotificationPermission,
   setupAppNotifications,
 } from "./utils/setupNotifications";
-import { displayGroupedAndroidNotification } from "./utils/groupedNotifications";
 import { shareReceiptImageFromWebPayload } from "./utils/shareReceiptImageNative";
 
 interface navType {
@@ -48,7 +48,10 @@ interface navType {
 //   };
 // }
 
-const url = "https://apis.gosca.co.kr/login/gosca";
+// 앱 별 주소
+// const url = "https://apis.gosca.co.kr/login/gosca";
+const url = "https://apis.gosca.co.kr/storeLists/lchayim";
+// const url = "https://apis.gosca.co.kr/storeLists/anding";
 
 export default function App() {
   const deviceHeight = Dimensions.get("window").height;
@@ -389,12 +392,14 @@ export default function App() {
                 const b64 = p.base64;
                 const fn = p.filename;
                 if (typeof b64 === "string" && b64.length > 20) {
-                  void shareReceiptImageFromWebPayload(b64, fn ?? "").catch(() => {
-                    Alert.alert(
-                      "오류",
-                      "영수증을 공유할 수 없습니다. 잠시 후 다시 시도해 주세요.",
-                    );
-                  });
+                  void shareReceiptImageFromWebPayload(b64, fn ?? "").catch(
+                    () => {
+                      Alert.alert(
+                        "오류",
+                        "영수증을 공유할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+                      );
+                    },
+                  );
                 }
                 return;
               }
