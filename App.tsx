@@ -49,8 +49,8 @@ interface navType {
 // }
 
 // 앱 별 주소
-// const url = "https://apis.gosca.co.kr/login/gosca";
-const url = "https://apis.gosca.co.kr/storeLists/lchayim";
+const url = "https://apis.gosca.co.kr/login/gosca";
+// const url = "https://apis.gosca.co.kr/storeLists/lchayim";
 // const url = "https://apis.gosca.co.kr/storeLists/anding";
 
 export default function App() {
