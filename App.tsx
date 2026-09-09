@@ -50,8 +50,8 @@ interface navType {
 
 // 앱 별 주소
 const url = "https://apis.gosca.co.kr/login/gosca";
-// const url = "https://apis.gosca.co.kr/storeLists/lchayim";
-// const url = "https://apis.gosca.co.kr/storeLists/anding";
+// const url = "https://apis.gosca.co.kr/storeLists/gosca/르하임";
+// const url = "https://apis.gosca.co.kr/storeLists/gosca/앤딩";
 
 export default function App() {
   const deviceHeight = Dimensions.get("window").height;

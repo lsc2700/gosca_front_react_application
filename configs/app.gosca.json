@@ -108,9 +108,11 @@
       "permissions": [
         "INTERNET",
         "POST_NOTIFICATIONS",
-        "VIBRATE",
-        "READ_MEDIA_IMAGES",
-        "READ_MEDIA_VIDEO"
+        "VIBRATE"
+      ],
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO"
       ],
       "edgeToEdgeEnabled": true,
       "packageVisibility": {
@@ -558,9 +560,10 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "영수증을 사진 앱에 저장·불러오기 위해 사진 라이브러리 접근이 필요합니다.",
+          "photosPermission": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
           "savePhotosPermission": "영수증 이미지를 갤러리에 바로 저장하기 위해 필요합니다.",
-          "isAccessMediaLocationEnabled": false
+          "isAccessMediaLocationEnabled": false,
+          "granularPermissions": []
         }
       ],
       [
@@ -587,6 +590,11 @@
       [
         "expo-build-properties",
         {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "enableMinifyInReleaseBuilds": true
+          },
           "ios": {
             "useFrameworks": "static",
             "forceStaticLinking": ["RNFBApp", "RNFBMessaging"]

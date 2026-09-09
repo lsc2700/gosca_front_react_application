@@ -2,7 +2,7 @@
   "expo": {
     "name": "르하임 스터디카페",
     "slug": "lchayim",
-    "version": "4.1.7",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/lchayim/icon.png",
     "scheme": "lchayim",
@@ -92,12 +92,12 @@
         "NSPhotoLibraryAddUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다."
       },
-      "version": "4.1.7",
+      "version": "1.0.2",
       "buildNumber": "42",
       "bundleIdentifier": "com.kaldoo.lchayim"
     },
     "android": {
-      "version": "4.1.7",
+      "version": "1.0.2",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/lchayim/adaptive-icon.png",
@@ -105,12 +105,10 @@
       },
       "versionCode": 42,
       "package": "com.kaldoo.lchayim",
-      "permissions": [
-        "INTERNET",
-        "POST_NOTIFICATIONS",
-        "VIBRATE",
-        "READ_MEDIA_IMAGES",
-        "READ_MEDIA_VIDEO"
+      "permissions": ["INTERNET", "POST_NOTIFICATIONS", "VIBRATE"],
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO"
       ],
       "edgeToEdgeEnabled": true,
       "packageVisibility": {
@@ -558,9 +556,10 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "영수증을 사진 앱에 저장·불러오기 위해 사진 라이브러리 접근이 필요합니다.",
+          "photosPermission": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
           "savePhotosPermission": "영수증 이미지를 갤러리에 바로 저장하기 위해 필요합니다.",
-          "isAccessMediaLocationEnabled": false
+          "isAccessMediaLocationEnabled": false,
+          "granularPermissions": []
         }
       ],
       [
@@ -587,6 +586,11 @@
       [
         "expo-build-properties",
         {
+          "android": {
+            "compileSdkVersion": 36,
+            "targetSdkVersion": 36,
+            "enableMinifyInReleaseBuilds": true
+          },
           "ios": {
             "useFrameworks": "static",
             "forceStaticLinking": ["RNFBApp", "RNFBMessaging"]
