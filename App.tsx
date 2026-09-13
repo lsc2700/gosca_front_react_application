@@ -25,7 +25,9 @@ import {
   requestExpoNotificationPermission,
   setupAppNotifications,
 } from "./utils/setupNotifications";
+import { GoscaAdMobBanner } from "./utils/GoscaAdMobBanner";
 import { shareReceiptImageFromWebPayload } from "./utils/shareReceiptImageNative";
+import mobileAds from "react-native-google-mobile-ads";
 
 interface navType {
   url: string;
@@ -74,10 +76,17 @@ export default function App() {
     url: "",
     canGoBack: false,
   });
+  const [showAdMobBanner, setShowAdMobBanner] = useState(false);
 
   useEffect(() => {
     let tokenRefreshUnsub: (() => void) | undefined;
     let foregroundMessageUnsub: (() => void) | undefined;
+
+    void mobileAds()
+      .initialize()
+      .catch(() => {
+        /* noop */
+      });
 
     void (async () => {
       try {
@@ -403,6 +412,11 @@ export default function App() {
                 }
                 return;
               }
+              if (parsed.type === "GOSCA_ADMOB_BANNER") {
+                const p = parsed as { type: string; visible?: boolean };
+                setShowAdMobBanner(p.visible === true);
+                return;
+              }
               if (parsed.type === "GOSCA_REQUEST_NATIVE_FCM") {
                 injectNativeFcmIntoWebView(
                   webviewRef.current,
@@ -462,7 +476,12 @@ export default function App() {
           //   });
           // `}
           onNavigationStateChange={(nav: navType) => {
-            setNavState({ url: nav.url, canGoBack: nav.canGoBack });
+            setNavState((prev) => {
+              if (prev.url !== nav.url) {
+                setShowAdMobBanner(false);
+              }
+              return { url: nav.url, canGoBack: nav.canGoBack };
+            });
           }}
           onContentProcessDidTerminate={() => {
             if (Platform.OS === "android") {
@@ -476,6 +495,7 @@ export default function App() {
             );
           }}
         />
+        {showAdMobBanner ? <GoscaAdMobBanner /> : null}
       </View>
     </SafeAreaView>
   );

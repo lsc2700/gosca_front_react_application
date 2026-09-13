@@ -552,6 +552,13 @@
       "favicon": "./assets/gosca/favicon.png"
     },
     "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8070999135501104~3633464490",
+          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
+        }
+      ],
       "expo-router",
       [
         "expo-media-library",
@@ -609,5 +616,9 @@
         "projectId": "56237538-81c4-482a-89ab-d2bbb4c194c7"
       }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-8070999135501104~3633464490",
+    "ios_app_id": "ca-app-pub-3940256099942544~1458002511"
   }
 }
