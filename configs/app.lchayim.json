@@ -2,6 +2,7 @@
   "expo": {
     "name": "르하임 스터디카페",
     "slug": "lchayim",
+    "owner": "gosca",
     "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/lchayim/icon.png",
@@ -614,7 +615,7 @@
       "router": {},
       "webUrl": "https://apis.gosca.co.kr/storeLists/gosca/르하임",
       "eas": {
-        "projectId": "56237538-81c4-482a-89ab-d2bbb4c194c7"
+        "projectId": "57ee4285-303a-40d4-b331-fa724363d640"
       }
     }
   },

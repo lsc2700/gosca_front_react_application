@@ -2,6 +2,7 @@
   "expo": {
     "name": "고스카",
     "slug": "gosca",
+    "owner": "gosca",
     "version": "4.1.7",
     "orientation": "portrait",
     "icon": "./assets/gosca/icon.png",
@@ -614,7 +615,7 @@
       "router": {},
       "webUrl": "https://apis.gosca.co.kr/login/gosca",
       "eas": {
-        "projectId": "91a480b9-66c4-424d-b871-7a91f88b0665"
+        "projectId": "6fbff3f1-83b2-4706-a414-2a891069c965"
       }
     }
   },
