@@ -601,6 +601,7 @@
           "android": {
             "compileSdkVersion": 36,
             "targetSdkVersion": 36,
+            "kotlinVersion": "2.3.0",
             "enableMinifyInReleaseBuilds": true
           },
           "ios": {
@@ -609,8 +610,7 @@
           }
         }
       ],
-      "./plugins/withRNFBNonModularHeaders.js",
-      "./plugins/withGoogleMobileAdsSdkPin.js"
+      "./plugins/withRNFBNonModularHeaders.js"
     ],
     "experiments": {
       "typedRoutes": true,
