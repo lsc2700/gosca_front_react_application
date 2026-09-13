@@ -597,7 +597,6 @@
           "android": {
             "compileSdkVersion": 36,
             "targetSdkVersion": 36,
-            "kotlinVersion": "2.3.0",
             "enableMinifyInReleaseBuilds": true
           },
           "ios": {
