@@ -612,6 +612,7 @@
     },
     "extra": {
       "router": {},
+      "webUrl": "https://apis.gosca.co.kr/login/gosca",
       "eas": {
         "projectId": "91a480b9-66c4-424d-b871-7a91f88b0665"
       }

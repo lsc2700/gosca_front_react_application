@@ -556,6 +556,13 @@
       "favicon": "./assets/andingspace/favicon.png"
     },
     "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-8070999135501104~3633464490",
+          "iosAppId": "ca-app-pub-8070999135501104~9027418093"
+        }
+      ],
       "expo-router",
       [
         "expo-media-library",
@@ -609,9 +616,14 @@
     },
     "extra": {
       "router": {},
+      "webUrl": "https://apis.gosca.co.kr/storeLists/gosca/앤딩",
       "eas": {
         "projectId": "31eefe69-4cde-4cfd-92c9-525357eab2ca"
       }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-8070999135501104~3633464490",
+    "ios_app_id": "ca-app-pub-8070999135501104~9027418093"
   }
 }

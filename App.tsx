@@ -28,6 +28,7 @@ import {
 import { GoscaAdMobBanner } from "./utils/GoscaAdMobBanner";
 import { shareReceiptImageFromWebPayload } from "./utils/shareReceiptImageNative";
 import mobileAds from "react-native-google-mobile-ads";
+import Constants from "expo-constants";
 
 interface navType {
   url: string;
@@ -50,10 +51,10 @@ interface navType {
 //   };
 // }
 
-// 앱 별 주소
-const url = "https://apis.gosca.co.kr/login/gosca";
-// const url = "https://apis.gosca.co.kr/storeLists/gosca/르하임";
-// const url = "https://apis.gosca.co.kr/storeLists/gosca/앤딩";
+const FALLBACK_WEB_URL = "https://apis.gosca.co.kr/login/gosca";
+const url =
+  (Constants.expoConfig?.extra as { webUrl?: string } | undefined)?.webUrl ||
+  FALLBACK_WEB_URL;
 
 export default function App() {
   const deviceHeight = Dimensions.get("window").height;

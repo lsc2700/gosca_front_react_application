@@ -4,6 +4,7 @@ import { TestIds } from "react-native-google-mobile-ads";
 /**
  * 정산: gosca88 개인(이승찬).
  * Android Play `com.user.gosca`, iOS App Store `1505155896`.
+ * 고스카·르하임·앤딩 앱이 같은 웹뷰(apis.gosca.co.kr)를 쓰므로 배너 단위는 같다.
  * 개발 배너는 TestIds.BANNER.
  */
 export const ADMOB_ANDROID_APP_ID = "ca-app-pub-8070999135501104~3633464490";

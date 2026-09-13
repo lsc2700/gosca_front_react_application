@@ -14,6 +14,21 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "APP_VARIANT": "gosca"
+      }
+    },
+    "preview-lchayim": {
+      "extends": "preview",
+      "env": {
+        "APP_VARIANT": "lchayim"
+      }
+    },
+    "preview-anding": {
+      "extends": "preview",
+      "env": {
+        "APP_VARIANT": "anding"
       }
     },
     "production": {
