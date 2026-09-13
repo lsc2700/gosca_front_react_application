@@ -605,7 +605,8 @@
           }
         }
       ],
-      "./plugins/withRNFBNonModularHeaders.js"
+      "./plugins/withRNFBNonModularHeaders.js",
+      "./plugins/withGoogleMobileAdsSdkPin.js"
     ],
     "experiments": {
       "typedRoutes": true,
