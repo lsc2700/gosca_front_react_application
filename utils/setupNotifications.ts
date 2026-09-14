@@ -32,6 +32,22 @@ async function ensureAndroidChannels(): Promise<void> {
       sound: "default",
       showBadge: true,
     }),
+    Notifications.setNotificationChannelAsync("gosca_inbox", {
+      name: "관리자 메세지",
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      sound: "default",
+      showBadge: true,
+    }),
+    Notifications.setNotificationChannelAsync("gosca_system", {
+      name: "시스템 메세지",
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      sound: "default",
+      showBadge: true,
+    }),
     Notifications.setNotificationChannelAsync("gosca_chat", {
       name: "채팅 알림",
       importance: Notifications.AndroidImportance.HIGH,

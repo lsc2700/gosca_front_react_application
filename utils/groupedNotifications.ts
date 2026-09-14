@@ -6,15 +6,26 @@ import { Platform } from "react-native";
 const GROUP_COUNT_KEY_PREFIX = "gosca_group_count:";
 
 /** 서버 FcmPushService.resolveAndroidChannelId 와 동일한 분류(표시용 라벨만 앱에서 한글화) */
-type GroupKind = "admin" | "chat" | "purchase" | "usage" | "default";
+type GroupKind = "admin" | "inbox" | "system" | "chat" | "purchase" | "usage" | "default";
 
 const GROUP_KIND_LABEL: Record<GroupKind, string> = {
   admin: "관리자 메시지",
+  inbox: "관리자 메세지",
+  system: "시스템 메세지",
   chat: "채팅 알림",
   purchase: "이용권·룸·사물함 구매",
   usage: "좌석·사물함 이용",
   default: "알림",
 };
+
+function firstNonEmpty(...vals: unknown[]): string | undefined {
+  for (const val of vals) {
+    if (typeof val === "string" && val.length > 0) {
+      return val;
+    }
+  }
+  return undefined;
+}
 
 function compactText(input: string): string {
   return input
@@ -43,16 +54,17 @@ function normalizeMultilineBody(input: string): string {
 }
 
 function pickTitle(msg: FirebaseMessagingTypes.RemoteMessage): string {
-  const t = msg.data?.title ?? msg.notification?.title;
-  if (typeof t === "string" && t.length > 0) {
-    return compactText(t);
-  }
-  return "고스카";
+  const t = firstNonEmpty(
+    msg.data?.title,
+    msg.data?.senderName,
+    msg.notification?.title,
+  );
+  return t ? compactText(t) : "고스카";
 }
 
 function pickBody(msg: FirebaseMessagingTypes.RemoteMessage): string {
-  const b = msg.data?.body ?? msg.notification?.body;
-  if (typeof b !== "string" || b.length === 0) {
+  const b = firstNonEmpty(msg.data?.body, msg.data?.message, msg.notification?.body);
+  if (!b) {
     return "새 알림이 도착했습니다.";
   }
   return normalizeMultilineBody(b);
@@ -73,6 +85,12 @@ function buildAndroidChildStyle(body: string):
 
 function normalizeKind(msg: FirebaseMessagingTypes.RemoteMessage): GroupKind {
   const raw = (msg.data?.type ?? "").toUpperCase();
+  if (raw.includes("INBOX_SYSTEM") || raw === "SYSTEM_INBOX") {
+    return "system";
+  }
+  if (raw.includes("INBOX")) {
+    return "inbox";
+  }
   if (raw.includes("CHAT") || raw.includes("MESSAGE") || raw.includes("DM")) {
     return "chat";
   }
@@ -103,6 +121,10 @@ function channelIdForKind(kind: GroupKind): string {
   switch (kind) {
     case "admin":
       return "gosca_admin";
+    case "inbox":
+      return "gosca_inbox";
+    case "system":
+      return "gosca_system";
     case "chat":
       return "gosca_chat";
     case "purchase":
@@ -154,6 +176,20 @@ export async function ensureNotifeeChannels(): Promise<void> {
     badge: true,
   });
   await notifee.createChannel({
+    id: "gosca_inbox",
+    name: "관리자 메세지",
+    importance: AndroidImportance.HIGH,
+    vibration: true,
+    badge: true,
+  });
+  await notifee.createChannel({
+    id: "gosca_system",
+    name: "시스템 메세지",
+    importance: AndroidImportance.HIGH,
+    vibration: true,
+    badge: true,
+  });
+  await notifee.createChannel({
     id: "gosca_chat",
     name: "채팅 알림",
     importance: AndroidImportance.HIGH,
@@ -179,7 +215,26 @@ export async function ensureNotifeeChannels(): Promise<void> {
 export async function displayGroupedAndroidNotification(
   msg: FirebaseMessagingTypes.RemoteMessage,
 ): Promise<void> {
+  const title = pickTitle(msg);
+  const body = pickBody(msg);
+  const displayLines = body.split("\n").filter((line) => line.length > 0);
+  const collapsedBody = displayLines[0] ?? body;
+
   if (Platform.OS !== "android") {
+    await notifee.displayNotification({
+      title,
+      body: collapsedBody,
+      data: msg.data,
+      ios: {
+        sound: "default",
+        foregroundPresentationOptions: {
+          banner: true,
+          list: true,
+          sound: true,
+          badge: true,
+        },
+      },
+    });
     return;
   }
 
@@ -191,11 +246,6 @@ export async function displayGroupedAndroidNotification(
   const count = await nextGroupCount(groupKey);
   const childId = msg.messageId ?? `${Date.now()}`;
   const summaryId = `summary:${groupKey}`;
-  const title = pickTitle(msg);
-  const body = pickBody(msg);
-
-  const displayLines = body.split("\n").filter((line) => line.length > 0);
-  const collapsedBody = displayLines[0] ?? body;
 
   await notifee.displayNotification({
     id: childId,

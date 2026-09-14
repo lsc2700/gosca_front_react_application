@@ -23,3 +23,11 @@ export function buildInjectNotificationPermissionResultScript(
   const detail = JSON.stringify({ granted });
   return `(function(){try{window.dispatchEvent(new CustomEvent('goscaNativeNotificationPermission',{detail:${detail}}));}catch(e){}})();true;`;
 }
+
+export function isInboxPushType(type?: unknown): boolean {
+  return typeof type === "string" && type.toUpperCase().includes("INBOX");
+}
+
+export function buildOpenInboxNotesScript(): string {
+  return `(function(){try{window.dispatchEvent(new CustomEvent('GOSCA_OPEN_INBOX_NOTES',{detail:{tab:'inquiry'}}));}catch(e){}})();true;`;
+}

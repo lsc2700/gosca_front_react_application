@@ -17,6 +17,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { iosSchemes } from "./constants/iosSchemes";
 import { displayGroupedAndroidNotification } from "./utils/groupedNotifications";
 import {
+  buildOpenInboxNotesScript,
+  buildRefreshInboxNotesScript,
+  isInboxPushType,
+} from "./utils/openInboxFromPush";
+import notifee, { EventType } from "@notifee/react-native";
+import {
   buildInjectNotificationPermissionResultScript,
   injectNativeFcmIntoWebView,
 } from "./utils/injectNativeFcmToken";
@@ -82,6 +88,15 @@ export default function App() {
   useEffect(() => {
     let tokenRefreshUnsub: (() => void) | undefined;
     let foregroundMessageUnsub: (() => void) | undefined;
+    let openedUnsub: (() => void) | undefined;
+    let notifeeUnsub: (() => void) | undefined;
+
+    const openInboxIfNeeded = (data?: { [key: string]: string | object } | null) => {
+      if (!isInboxPushType(data)) {
+        return;
+      }
+      webviewRef.current?.injectJavaScript(buildOpenInboxNotesScript());
+    };
 
     void mobileAds()
       .initialize()
@@ -111,11 +126,34 @@ export default function App() {
 
     foregroundMessageUnsub = messaging().onMessage(async (remoteMessage) => {
       await displayGroupedAndroidNotification(remoteMessage);
+      if (isInboxPushType(remoteMessage.data)) {
+        webviewRef.current?.injectJavaScript(buildRefreshInboxNotesScript());
+      }
+    });
+    openedUnsub = messaging().onNotificationOpenedApp((remoteMessage) => {
+      openInboxIfNeeded(remoteMessage.data);
+    });
+    void messaging()
+      .getInitialNotification()
+      .then((remoteMessage) => {
+        if (remoteMessage) {
+          openInboxIfNeeded(remoteMessage.data);
+        }
+      })
+      .catch(() => {
+        /* noop */
+      });
+    notifeeUnsub = notifee.onForegroundEvent(({ type, detail }) => {
+      if (type === EventType.PRESS) {
+        openInboxIfNeeded(detail.notification?.data);
+      }
     });
 
     return () => {
       tokenRefreshUnsub?.();
       foregroundMessageUnsub?.();
+      openedUnsub?.();
+      notifeeUnsub?.();
     };
   }, []);
 
