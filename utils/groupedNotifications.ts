@@ -10,7 +10,7 @@ type GroupKind = "admin" | "inbox" | "system" | "chat" | "purchase" | "usage" | 
 
 const GROUP_KIND_LABEL: Record<GroupKind, string> = {
   admin: "관리자 메시지",
-  inbox: "관리자 메세지",
+  inbox: "쪽지",
   system: "시스템 메세지",
   chat: "채팅 알림",
   purchase: "이용권·룸·사물함 구매",
@@ -84,7 +84,7 @@ function buildAndroidChildStyle(body: string):
 }
 
 function normalizeKind(msg: FirebaseMessagingTypes.RemoteMessage): GroupKind {
-  const raw = (msg.data?.type ?? "").toUpperCase();
+  const raw = String(msg.data?.type ?? "").toUpperCase();
   if (raw.includes("INBOX_SYSTEM") || raw === "SYSTEM_INBOX") {
     return "system";
   }
@@ -177,7 +177,7 @@ export async function ensureNotifeeChannels(): Promise<void> {
   });
   await notifee.createChannel({
     id: "gosca_inbox",
-    name: "관리자 메세지",
+    name: "쪽지",
     importance: AndroidImportance.HIGH,
     vibration: true,
     badge: true,
@@ -271,7 +271,7 @@ export async function displayGroupedAndroidNotification(
       groupSummary: true,
       smallIcon: "ic_launcher",
       pressAction: { id: "default" },
-      number: count,
+      badgeCount: count,
     },
   });
 

@@ -1,4 +1,6 @@
-export function isInboxPushType(data?: { [key: string]: string | object } | null): boolean {
+export function isInboxPushType(
+  data?: Record<string, unknown> | null,
+): boolean {
   const type = String(data?.type ?? "").toUpperCase();
   return type.includes("INBOX");
 }

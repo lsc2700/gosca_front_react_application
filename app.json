@@ -90,6 +90,7 @@
           "upluscorporation"
         ],
         "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["remote-notification"],
         "NSPhotoLibraryAddUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다."
       },
@@ -106,7 +107,7 @@
       },
       "versionCode": 42,
       "package": "com.gosca.users",
-      "permissions": ["INTERNET", "POST_NOTIFICATIONS", "VIBRATE"],
+      "permissions": ["INTERNET", "POST_NOTIFICATIONS", "VIBRATE", "RECEIVE_BOOT_COMPLETED", "WAKE_LOCK"],
       "blockedPermissions": [
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO"
@@ -600,6 +601,7 @@
             "enableMinifyInReleaseBuilds": true
           },
           "ios": {
+            "deploymentTarget": "15.1",
             "useFrameworks": "static",
             "forceStaticLinking": ["RNFBApp", "RNFBMessaging"]
           }

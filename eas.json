@@ -32,10 +32,22 @@
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "credentialsSource": "local",
+      "env": {
+        "APP_VARIANT": "gosca"
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "1505155896",
+        "appleTeamId": "5D59MAHH43",
+        "ascApiKeyPath": "C:/Users/sclee/.eas-asc/AuthKey_TNCFD7CN4Q.p8",
+        "ascApiKeyIssuerId": "8d809c72-6ea1-433b-829e-9dd99684656e",
+        "ascApiKeyId": "TNCFD7CN4Q"
+      }
+    }
   }
 }

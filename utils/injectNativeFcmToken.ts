@@ -16,18 +16,29 @@ export function injectNativeFcmIntoWebView(
   wv.injectJavaScript(buildInjectNativeFcmTokenScript(token));
 }
 
+export function buildInjectNativeAppMetaScript(meta: {
+  version: string;
+  platform: string;
+  bundleId: string;
+}): string {
+  const enc = JSON.stringify(meta);
+  return `(function(){try{window.__GOSCA_NATIVE_APP__=${enc};}catch(e){}})();true;`;
+}
+
+export function injectNativeAppMetaIntoWebView(
+  wv: WebViewInjectTarget,
+  meta: { version: string; platform: string; bundleId: string },
+): void {
+  if (!wv) {
+    return;
+  }
+  wv.injectJavaScript(buildInjectNativeAppMetaScript(meta));
+}
+
 /** 웹 `requestUserNotificationPermission` — `goscaNativeNotificationPermission` 수신 */
 export function buildInjectNotificationPermissionResultScript(
   granted: boolean,
 ): string {
   const detail = JSON.stringify({ granted });
   return `(function(){try{window.dispatchEvent(new CustomEvent('goscaNativeNotificationPermission',{detail:${detail}}));}catch(e){}})();true;`;
-}
-
-export function isInboxPushType(type?: unknown): boolean {
-  return typeof type === "string" && type.toUpperCase().includes("INBOX");
-}
-
-export function buildOpenInboxNotesScript(): string {
-  return `(function(){try{window.dispatchEvent(new CustomEvent('GOSCA_OPEN_INBOX_NOTES',{detail:{tab:'inquiry'}}));}catch(e){}})();true;`;
 }

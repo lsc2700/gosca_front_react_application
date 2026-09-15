@@ -24,6 +24,7 @@ import {
 import notifee, { EventType } from "@notifee/react-native";
 import {
   buildInjectNotificationPermissionResultScript,
+  injectNativeAppMetaIntoWebView,
   injectNativeFcmIntoWebView,
 } from "./utils/injectNativeFcmToken";
 import {
@@ -33,7 +34,7 @@ import {
 } from "./utils/setupNotifications";
 import { GoscaAdMobBanner } from "./utils/GoscaAdMobBanner";
 import { shareReceiptImageFromWebPayload } from "./utils/shareReceiptImageNative";
-import mobileAds from "react-native-google-mobile-ads";
+import { initAdMobAfterTracking } from "./utils/initAdMob";
 import Constants from "expo-constants";
 
 interface navType {
@@ -62,6 +63,20 @@ const url =
   (Constants.expoConfig?.extra as { webUrl?: string } | undefined)?.webUrl ||
   FALLBACK_WEB_URL;
 
+const GOSCA_IOS_STORE_URL = "https://apps.apple.com/kr/app/id1505155896";
+const GOSCA_ANDROID_STORE_URL =
+  "https://play.google.com/store/apps/details?id=com.user.gosca";
+
+const nativeAppMeta = {
+  version: String(Constants.expoConfig?.version ?? "4.1.7"),
+  platform: Platform.OS,
+  bundleId: String(
+    Platform.OS === "ios"
+      ? (Constants.expoConfig?.ios?.bundleIdentifier ?? "com.gosca.users")
+      : (Constants.expoConfig?.android?.package ?? "com.gosca.users"),
+  ),
+};
+
 export default function App() {
   const deviceHeight = Dimensions.get("window").height;
   const deviceWidth = Dimensions.get("window").width;
@@ -84,6 +99,7 @@ export default function App() {
     canGoBack: false,
   });
   const [showAdMobBanner, setShowAdMobBanner] = useState(false);
+  const [adMobReady, setAdMobReady] = useState(false);
 
   useEffect(() => {
     let tokenRefreshUnsub: (() => void) | undefined;
@@ -91,20 +107,29 @@ export default function App() {
     let openedUnsub: (() => void) | undefined;
     let notifeeUnsub: (() => void) | undefined;
 
-    const openInboxIfNeeded = (data?: { [key: string]: string | object } | null) => {
+    const openInboxIfNeeded = (data?: Record<string, unknown> | null) => {
       if (!isInboxPushType(data)) {
         return;
       }
       webviewRef.current?.injectJavaScript(buildOpenInboxNotesScript());
     };
 
-    void mobileAds()
-      .initialize()
-      .catch(() => {
-        /* noop */
-      });
-
     void (async () => {
+      // iOS: ATT(광고)와 알림 권한을 동시에 띄우면 최신 기종에서 둘째 창이 안 뜬다.
+      // Android: 광고 SDK 초기화가 막혀도 푸시는 진행한다.
+      if (Platform.OS === "ios") {
+        try {
+          await initAdMobAfterTracking();
+        } catch {
+          /* ATT/광고 실패해도 푸시는 진행 */
+        }
+        setAdMobReady(true);
+        await new Promise((resolve) => setTimeout(resolve, 900));
+      } else {
+        void initAdMobAfterTracking()
+          .catch(() => undefined)
+          .finally(() => setAdMobReady(true));
+      }
       try {
         await setupAppNotifications();
         const token = await fetchDevicePushToken();
@@ -403,6 +428,7 @@ export default function App() {
           javaScriptCanOpenWindowsAutomatically={true}
           injectedJavaScriptBeforeContentLoaded={`
             (function() {
+              try { window.__GOSCA_NATIVE_APP__ = ${JSON.stringify(nativeAppMeta)}; } catch (e) {}
               var _open = window.open;
               window.open = function(u){
                 try {
@@ -429,6 +455,14 @@ export default function App() {
               try {
                 parsed = JSON.parse(raw) as { type?: string };
               } catch {
+                return;
+              }
+              if (parsed.type === "GOSCA_OPEN_STORE") {
+                const storeUrl =
+                  Platform.OS === "ios"
+                    ? GOSCA_IOS_STORE_URL
+                    : GOSCA_ANDROID_STORE_URL;
+                void Linking.openURL(storeUrl);
                 return;
               }
               if (parsed.type === "GOSCA_SHARE_RECEIPT_IMAGE") {
@@ -528,13 +562,14 @@ export default function App() {
             }
           }}
           onLoadEnd={() => {
+            injectNativeAppMetaIntoWebView(webviewRef.current, nativeAppMeta);
             injectNativeFcmIntoWebView(
               webviewRef.current,
               devicePushTokenRef.current,
             );
           }}
         />
-        {showAdMobBanner ? <GoscaAdMobBanner /> : null}
+        {showAdMobBanner && adMobReady ? <GoscaAdMobBanner /> : null}
       </View>
     </SafeAreaView>
   );

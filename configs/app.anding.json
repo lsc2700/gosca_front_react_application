@@ -90,6 +90,7 @@
           "upluscorporation"
         ],
         "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["remote-notification"],
         "NSPhotoLibraryAddUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다."
       },
@@ -109,7 +110,9 @@
       "permissions": [
         "INTERNET",
         "POST_NOTIFICATIONS",
-        "VIBRATE"
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "WAKE_LOCK"
       ],
       "blockedPermissions": [
         "android.permission.READ_MEDIA_IMAGES",
@@ -560,8 +563,16 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-8070999135501104~3633464490",
-          "iosAppId": "ca-app-pub-8070999135501104~9027418093"
+          "androidAppId": "ca-app-pub-8070999135501104~3138408968",
+          "iosAppId": "ca-app-pub-8070999135501104~6886082281",
+          "delayAppMeasurementInit": true,
+          "userTrackingUsageDescription": "맞춤 광고를 보여주기 위해 사용됩니다."
+        }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "맞춤 광고를 보여주기 위해 사용됩니다."
         }
       ],
       "expo-router",
@@ -604,6 +615,7 @@
             "enableMinifyInReleaseBuilds": true
           },
           "ios": {
+            "deploymentTarget": "15.1",
             "useFrameworks": "static",
             "forceStaticLinking": ["RNFBApp", "RNFBMessaging"]
           }
@@ -624,7 +636,7 @@
     }
   },
   "react-native-google-mobile-ads": {
-    "android_app_id": "ca-app-pub-8070999135501104~3633464490",
-    "ios_app_id": "ca-app-pub-8070999135501104~9027418093"
+    "android_app_id": "ca-app-pub-8070999135501104~3138408968",
+    "ios_app_id": "ca-app-pub-8070999135501104~6886082281"
   }
 }
