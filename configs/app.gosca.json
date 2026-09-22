@@ -92,6 +92,7 @@
         "ITSAppUsesNonExemptEncryption": false,
         "UIBackgroundModes": ["remote-notification"],
         "NSUserTrackingUsageDescription": "맞춤 광고를 보여주기 위해 사용됩니다.",
+        "NSLocationWhenInUseUsageDescription": "내주변 매장을 보여주기 위해 현재 위치를 사용합니다.",
         "NSPhotoLibraryAddUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다."
       },
@@ -113,7 +114,9 @@
         "POST_NOTIFICATIONS",
         "VIBRATE",
         "RECEIVE_BOOT_COMPLETED",
-        "WAKE_LOCK"
+        "WAKE_LOCK",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
       ],
       "blockedPermissions": [
         "android.permission.READ_MEDIA_IMAGES",
@@ -574,6 +577,12 @@
         "expo-tracking-transparency",
         {
           "userTrackingPermission": "맞춤 광고를 보여주기 위해 사용됩니다."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "내주변 매장을 보여주기 위해 현재 위치를 사용합니다."
         }
       ],
       "expo-router",

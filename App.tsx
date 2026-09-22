@@ -35,6 +35,11 @@ import {
 import { GoscaAdMobBanner } from "./utils/GoscaAdMobBanner";
 import { shareReceiptImageFromWebPayload } from "./utils/shareReceiptImageNative";
 import { initAdMobAfterTracking } from "./utils/initAdMob";
+import { fetchLocationForNearMe } from "./utils/fetchLocationForNearMe";
+import {
+  nativeStoreUrl,
+  promptStoreUpdateOnLaunch,
+} from "./utils/promptStoreUpdate";
 import Constants from "expo-constants";
 
 interface navType {
@@ -62,10 +67,6 @@ const FALLBACK_WEB_URL = "https://apis.gosca.co.kr/login/gosca";
 const url =
   (Constants.expoConfig?.extra as { webUrl?: string } | undefined)?.webUrl ||
   FALLBACK_WEB_URL;
-
-const GOSCA_IOS_STORE_URL = "https://apps.apple.com/kr/app/id1505155896";
-const GOSCA_ANDROID_STORE_URL =
-  "https://play.google.com/store/apps/details?id=com.user.gosca";
 
 const nativeAppMeta = {
   version: String(Constants.expoConfig?.version ?? "4.1.7"),
@@ -140,6 +141,7 @@ export default function App() {
       } catch {
         /* noop */
       }
+      void promptStoreUpdateOnLaunch();
     })();
 
     tokenRefreshUnsub = messaging().onTokenRefresh((next) => {
@@ -458,11 +460,7 @@ export default function App() {
                 return;
               }
               if (parsed.type === "GOSCA_OPEN_STORE") {
-                const storeUrl =
-                  Platform.OS === "ios"
-                    ? GOSCA_IOS_STORE_URL
-                    : GOSCA_ANDROID_STORE_URL;
-                void Linking.openURL(storeUrl);
+                void Linking.openURL(nativeStoreUrl());
                 return;
               }
               if (parsed.type === "GOSCA_SHARE_RECEIPT_IMAGE") {
@@ -483,6 +481,15 @@ export default function App() {
                     },
                   );
                 }
+                return;
+              }
+              if (parsed.type === "getLocation") {
+                // 웹 「내주변」 탭에서만 위치 동의·조회. 앱 시작 시에는 호출하지 않는다.
+                const payload = await fetchLocationForNearMe();
+                const raw = JSON.stringify(payload);
+                webviewRef.current?.injectJavaScript(
+                  `(function(){try{var d=${JSON.stringify(raw)};window.dispatchEvent(new CustomEvent('goscaNativeLocation',{detail:d}));window.dispatchEvent(new MessageEvent('message',{data:d}));}catch(e){}})();true;`,
+                );
                 return;
               }
               if (parsed.type === "GOSCA_ADMOB_BANNER") {
@@ -569,7 +576,8 @@ export default function App() {
             );
           }}
         />
-        {showAdMobBanner && adMobReady ? <GoscaAdMobBanner /> : null}
+        {/* adMobReady 시점에 preload, 완료 화면 메시지로 visible만 켠다 */}
+        {adMobReady ? <GoscaAdMobBanner visible={showAdMobBanner} /> : null}
       </View>
     </SafeAreaView>
   );
