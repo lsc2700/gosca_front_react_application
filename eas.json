@@ -37,12 +37,103 @@
       "env": {
         "APP_VARIANT": "gosca"
       }
+    },
+    "production-play": {
+      "extends": "production",
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "APP_VARIANT": "gosca",
+        "ANDROID_STORE_PACKAGE": "com.user.gosca"
+      }
+    },
+    "production-lchayim": {
+      "extends": "production",
+      "autoIncrement": true,
+      "credentialsSource": "remote",
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "APP_VARIANT": "lchayim"
+      }
+    },
+    "production-anding": {
+      "extends": "production",
+      "autoIncrement": true,
+      "credentialsSource": "remote",
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "APP_VARIANT": "anding"
+      }
+    },
+    "production-lchayim-ios": {
+      "extends": "production-lchayim",
+      "credentialsSource": "local"
+    },
+    "production-anding-ios": {
+      "extends": "production-anding",
+      "credentialsSource": "local"
     }
   },
   "submit": {
     "production": {
       "ios": {
         "ascAppId": "1505155896",
+        "appleTeamId": "5D59MAHH43",
+        "ascApiKeyPath": "C:/Users/sclee/.eas-asc/AuthKey_TNCFD7CN4Q.p8",
+        "ascApiKeyIssuerId": "8d809c72-6ea1-433b-829e-9dd99684656e",
+        "ascApiKeyId": "TNCFD7CN4Q"
+      }
+    },
+    "production-play": {
+      "android": {
+        "track": "production",
+        "releaseStatus": "draft",
+        "applicationId": "com.user.gosca"
+      },
+      "ios": {
+        "ascAppId": "1505155896",
+        "appleTeamId": "5D59MAHH43",
+        "ascApiKeyPath": "C:/Users/sclee/.eas-asc/AuthKey_TNCFD7CN4Q.p8",
+        "ascApiKeyIssuerId": "8d809c72-6ea1-433b-829e-9dd99684656e",
+        "ascApiKeyId": "TNCFD7CN4Q"
+      }
+    },
+    "production-lchayim": {
+      "ios": {
+        "ascAppId": "6745785489",
+        "appleTeamId": "5D59MAHH43",
+        "ascApiKeyPath": "C:/Users/sclee/.eas-asc/AuthKey_TNCFD7CN4Q.p8",
+        "ascApiKeyIssuerId": "8d809c72-6ea1-433b-829e-9dd99684656e",
+        "ascApiKeyId": "TNCFD7CN4Q"
+      }
+    },
+    "production-lchayim-ios": {
+      "ios": {
+        "ascAppId": "6745785489",
+        "appleTeamId": "5D59MAHH43",
+        "ascApiKeyPath": "C:/Users/sclee/.eas-asc/AuthKey_TNCFD7CN4Q.p8",
+        "ascApiKeyIssuerId": "8d809c72-6ea1-433b-829e-9dd99684656e",
+        "ascApiKeyId": "TNCFD7CN4Q"
+      }
+    },
+    "production-anding": {
+      "ios": {
+        "ascAppId": "6748913885",
+        "appleTeamId": "5D59MAHH43",
+        "ascApiKeyPath": "C:/Users/sclee/.eas-asc/AuthKey_TNCFD7CN4Q.p8",
+        "ascApiKeyIssuerId": "8d809c72-6ea1-433b-829e-9dd99684656e",
+        "ascApiKeyId": "TNCFD7CN4Q"
+      }
+    },
+    "production-anding-ios": {
+      "ios": {
+        "ascAppId": "6748913885",
         "appleTeamId": "5D59MAHH43",
         "ascApiKeyPath": "C:/Users/sclee/.eas-asc/AuthKey_TNCFD7CN4Q.p8",
         "ascApiKeyIssuerId": "8d809c72-6ea1-433b-829e-9dd99684656e",

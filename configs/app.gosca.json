@@ -3,7 +3,7 @@
     "name": "고스카",
     "slug": "gosca",
     "owner": "gosca",
-    "version": "4.1.7",
+    "version": "4.1.8",
     "orientation": "portrait",
     "icon": "./assets/gosca/icon.png",
     "scheme": "gosca",
@@ -96,12 +96,12 @@
         "NSPhotoLibraryAddUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다."
       },
-      "version": "4.1.7",
+      "version": "4.1.8",
       "buildNumber": "42",
       "bundleIdentifier": "com.gosca.users"
     },
     "android": {
-      "version": "4.1.7",
+      "version": "4.1.8",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/gosca/adaptive-icon.png",
