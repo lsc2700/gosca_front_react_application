@@ -3,7 +3,7 @@
     "name": "르하임 스터디카페",
     "slug": "lchayim",
     "owner": "gosca",
-    "version": "1.0.2",
+    "version": "1.0.9",
     "orientation": "portrait",
     "icon": "./assets/lchayim/icon.png",
     "scheme": "lchayim",
@@ -94,18 +94,18 @@
         "NSPhotoLibraryAddUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다."
       },
-      "version": "1.0.2",
-      "buildNumber": "42",
+      "version": "1.0.9",
+      "buildNumber": "43",
       "bundleIdentifier": "com.kaldoo.lchayim"
     },
     "android": {
-      "version": "1.0.2",
+      "version": "1.0.9",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/lchayim/adaptive-icon.png",
         "backgroundImage": "./assets/lchayim/adaptive-icon.png"
       },
-      "versionCode": 42,
+      "versionCode": 43,
       "package": "com.kaldoo.lchayim",
       "permissions": ["INTERNET", "POST_NOTIFICATIONS", "VIBRATE", "RECEIVE_BOOT_COMPLETED", "WAKE_LOCK"],
       "blockedPermissions": [
@@ -624,6 +624,11 @@
     "extra": {
       "router": {},
       "webUrl": "https://apis.gosca.co.kr/storeLists/gosca/르하임",
+      "adMob": {
+        "brand": "lchayim",
+        "androidBannerUnitId": "ca-app-pub-8070999135501104/3269715991",
+        "iosBannerUnitId": "ca-app-pub-8070999135501104/4016566319"
+      },
       "eas": {
         "projectId": "57ee4285-303a-40d4-b331-fa724363d640"
       }

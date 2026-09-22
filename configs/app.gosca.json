@@ -631,6 +631,11 @@
     "extra": {
       "router": {},
       "webUrl": "https://apis.gosca.co.kr/login/gosca",
+      "adMob": {
+        "brand": "gosca",
+        "androidBannerUnitId": "ca-app-pub-8070999135501104/7571253234",
+        "iosBannerUnitId": "ca-app-pub-8070999135501104/4367961663"
+      },
       "eas": {
         "projectId": "6fbff3f1-83b2-4706-a414-2a891069c965"
       }
