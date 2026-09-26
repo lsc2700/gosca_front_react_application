@@ -24,6 +24,16 @@ export const ADMOB_APP_IDS: Record<AdMobBrand, { android: string; ios: string }>
   },
 };
 
+/** 앱별 네이티브 고급형(native-feed). 고스카만. 앱 오프닝 단위는 쓰지 않는다. */
+export const ADMOB_NATIVE_UNITS: Record<AdMobBrand, { android: string; ios: string }> = {
+  gosca: {
+    android: "ca-app-pub-8070999135501104/5034489732",
+    ios: "ca-app-pub-8070999135501104/9205009892",
+  },
+  lchayim: { android: "", ios: "" },
+  anding: { android: "", ios: "" },
+};
+
 /** 앱별 complete-bottom 배너. 고스카 단위를 르하임·앤딩에 넣지 말 것. */
 export const ADMOB_BANNER_UNITS: Record<AdMobBrand, { android: string; ios: string }> = {
   gosca: {
@@ -100,3 +110,15 @@ function productionBannerUnitId(): string {
 export const ADMOB_BANNER_UNIT_ID = __DEV__
   ? TestIds.BANNER
   : productionBannerUnitId();
+
+function productionNativeUnitId(): string {
+  const units = ADMOB_NATIVE_UNITS[brand];
+  if (Platform.OS === "ios") return units.ios;
+  if (Platform.OS === "android") return units.android;
+  return "";
+}
+
+/** 목록 사이 네이티브 고급형. 고스카 스토어 앱만. 개발은 테스트 네이티브. */
+export const ADMOB_NATIVE_UNIT_ID = __DEV__
+  ? TestIds.NATIVE
+  : productionNativeUnitId();

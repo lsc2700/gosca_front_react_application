@@ -1,7 +1,7 @@
 // import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as Location from "expo-location";
 import messaging from "@react-native-firebase/messaging";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   BackHandler,
@@ -23,6 +23,7 @@ import {
 } from "./utils/openInboxFromPush";
 import notifee, { EventType } from "@notifee/react-native";
 import {
+  buildInjectAdMobResultScript,
   buildInjectNotificationPermissionResultScript,
   injectNativeAppMetaIntoWebView,
   injectNativeFcmIntoWebView,
@@ -33,6 +34,7 @@ import {
   setupAppNotifications,
 } from "./utils/setupNotifications";
 import { GoscaAdMobBanner } from "./utils/GoscaAdMobBanner";
+import { GoscaAdMobNative, type NativeFeedFrame } from "./utils/GoscaAdMobNative";
 import { shareReceiptImageFromWebPayload } from "./utils/shareReceiptImageNative";
 import { initAdMobAfterTracking } from "./utils/initAdMob";
 import { fetchLocationForNearMe } from "./utils/fetchLocationForNearMe";
@@ -71,6 +73,7 @@ const url =
 const nativeAppMeta = {
   version: String(Constants.expoConfig?.version ?? "4.1.7"),
   platform: Platform.OS,
+  nativeAd: true,
   bundleId: String(
     Platform.OS === "ios"
       ? (Constants.expoConfig?.ios?.bundleIdentifier ?? "com.gosca.users")
@@ -100,7 +103,51 @@ export default function App() {
     canGoBack: false,
   });
   const [showAdMobBanner, setShowAdMobBanner] = useState(false);
+  const [nativeFeed, setNativeFeed] = useState<NativeFeedFrame | null>(null);
   const [adMobReady, setAdMobReady] = useState(false);
+  type AdLoadStatus = "loading" | "ok" | "fail";
+  const nativeStatusRef = useRef<AdLoadStatus>("loading");
+  const bannerStatusRef = useRef<AdLoadStatus>("loading");
+  const nativeAskedSlotRef = useRef<string | null>(null);
+  const nativeReportedRef = useRef(false);
+  const bannerAskedRef = useRef(false);
+
+  const reportAd = useCallback(
+    (kind: "native" | "banner", ok: boolean, slot?: string) => {
+      webviewRef.current?.injectJavaScript(
+        buildInjectAdMobResultScript({ kind, ok, slot }),
+      );
+    },
+    [],
+  );
+
+  const onNativeStatus = useCallback(
+    (status: AdLoadStatus) => {
+      nativeStatusRef.current = status;
+      const slot = nativeAskedSlotRef.current;
+      if (!slot || status === "loading" || nativeReportedRef.current) return;
+      nativeReportedRef.current = true;
+      reportAd("native", status === "ok", slot);
+      if (status === "fail") {
+        nativeAskedSlotRef.current = null;
+        setNativeFeed(null);
+      }
+    },
+    [reportAd],
+  );
+
+  const onBannerStatus = useCallback(
+    (status: AdLoadStatus) => {
+      bannerStatusRef.current = status;
+      if (!bannerAskedRef.current || status === "loading") return;
+      reportAd("banner", status === "ok");
+      if (status === "fail") {
+        bannerAskedRef.current = false;
+        setShowAdMobBanner(false);
+      }
+    },
+    [reportAd],
+  );
 
   useEffect(() => {
     let tokenRefreshUnsub: (() => void) | undefined;
@@ -494,7 +541,58 @@ export default function App() {
               }
               if (parsed.type === "GOSCA_ADMOB_BANNER") {
                 const p = parsed as { type: string; visible?: boolean };
-                setShowAdMobBanner(p.visible === true);
+                if (p.visible === true) {
+                  bannerAskedRef.current = true;
+                  if (bannerStatusRef.current === "fail") {
+                    bannerAskedRef.current = false;
+                    setShowAdMobBanner(false);
+                    reportAd("banner", false);
+                  } else {
+                    setShowAdMobBanner(true);
+                    if (bannerStatusRef.current === "ok") reportAd("banner", true);
+                  }
+                } else {
+                  bannerAskedRef.current = false;
+                  setShowAdMobBanner(false);
+                }
+                return;
+              }
+              if (parsed.type === "GOSCA_ADMOB_NATIVE") {
+                const p = parsed as {
+                  visible?: boolean;
+                  slot?: string;
+                  x?: number;
+                  y?: number;
+                  width?: number;
+                  height?: number;
+                };
+                if (p.visible !== true || !p.slot) {
+                  if (nativeAskedSlotRef.current === p.slot) {
+                    nativeAskedSlotRef.current = null;
+                    nativeReportedRef.current = false;
+                  }
+                  setNativeFeed((prev) => (prev?.slot === p.slot ? null : prev));
+                  return;
+                }
+                nativeAskedSlotRef.current = p.slot;
+                if (nativeStatusRef.current === "fail") {
+                  nativeAskedSlotRef.current = null;
+                  nativeReportedRef.current = false;
+                  setNativeFeed(null);
+                  reportAd("native", false, p.slot);
+                  return;
+                }
+                setNativeFeed({
+                  slot: p.slot,
+                  x: Number(p.x) || 0,
+                  y: Number(p.y) || 0,
+                  width: Number(p.width) || 0,
+                  height: Number(p.height) || 0,
+                });
+                if (nativeStatusRef.current === "ok" && !nativeReportedRef.current) {
+                  nativeReportedRef.current = true;
+                  reportAd("native", true, p.slot);
+                }
                 return;
               }
               if (parsed.type === "GOSCA_REQUEST_NATIVE_FCM") {
@@ -559,6 +657,7 @@ export default function App() {
             setNavState((prev) => {
               if (prev.url !== nav.url) {
                 setShowAdMobBanner(false);
+                setNativeFeed(null);
               }
               return { url: nav.url, canGoBack: nav.canGoBack };
             });
@@ -577,7 +676,10 @@ export default function App() {
           }}
         />
         {/* adMobReady 시점에 preload, 완료 화면 메시지로 visible만 켠다 */}
-        {adMobReady ? <GoscaAdMobBanner visible={showAdMobBanner} /> : null}
+        {adMobReady ? (
+          <GoscaAdMobBanner visible={showAdMobBanner} onStatus={onBannerStatus} />
+        ) : null}
+        {adMobReady ? <GoscaAdMobNative frame={nativeFeed} onStatus={onNativeStatus} /> : null}
       </View>
     </SafeAreaView>
   );

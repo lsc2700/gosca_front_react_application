@@ -7,6 +7,7 @@ import { ADMOB_BANNER_UNIT_ID } from "./adMobConfig";
 type Props = {
   /** 완료 화면일 때만 true. false여도 배너는 마운트해 미리 로드한다. */
   visible: boolean;
+  onStatus: (status: "loading" | "ok" | "fail") => void;
 };
 
 /**
@@ -14,10 +15,11 @@ type Props = {
  * visible 이 되면 이미 로드된 배너를 화면 하단에 붙인다.
  * (완료 순간에야 마운트하면 1~2초 로드 동안 사용자가 나가 노출률이 떨어진다.)
  */
-export function GoscaAdMobBanner({ visible }: Props) {
+export function GoscaAdMobBanner({ visible, onStatus }: Props) {
   const [npa, setNpa] = useState(true);
   const [loadKey, setLoadKey] = useState(0);
   const wasVisibleRef = useRef(false);
+  const failRetryRef = useRef(0);
 
   useEffect(() => {
     if (Platform.OS !== "ios") {
@@ -38,10 +40,15 @@ export function GoscaAdMobBanner({ visible }: Props) {
       return;
     }
     wasVisibleRef.current = false;
+    failRetryRef.current = 0;
     // 숨긴 뒤 다음 완료 화면용으로 새 광고를 미리 받는다.
     const t = setTimeout(() => setLoadKey((k) => k + 1), 400);
     return () => clearTimeout(t);
   }, [visible]);
+
+  useEffect(() => {
+    if (!ADMOB_BANNER_UNIT_ID) onStatus("fail");
+  }, [onStatus]);
 
   if (!ADMOB_BANNER_UNIT_ID) {
     return null;
@@ -68,6 +75,20 @@ export function GoscaAdMobBanner({ visible }: Props) {
         unitId={ADMOB_BANNER_UNIT_ID}
         size={BannerAdSize.LARGE_BANNER}
         requestOptions={{ requestNonPersonalizedAdsOnly: npa }}
+        onAdLoaded={() => {
+          failRetryRef.current = 0;
+          onStatus("ok");
+        }}
+        onAdFailedToLoad={() => {
+          // 프리로드 실패 시 짧게 재시도(최대 2회). 그 뒤에도 실패면 웹이 칸을 뺀다.
+          if (failRetryRef.current >= 2) {
+            onStatus("fail");
+            return;
+          }
+          failRetryRef.current += 1;
+          const delay = 1200 * failRetryRef.current;
+          setTimeout(() => setLoadKey((k) => k + 1), delay);
+        }}
       />
     </View>
   );
