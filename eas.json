@@ -105,6 +105,11 @@
       }
     },
     "production-lchayim": {
+      "android": {
+        "track": "production",
+        "releaseStatus": "draft",
+        "applicationId": "com.kaldoo.lchayim"
+      },
       "ios": {
         "ascAppId": "6745785489",
         "appleTeamId": "5D59MAHH43",
@@ -123,6 +128,11 @@
       }
     },
     "production-anding": {
+      "android": {
+        "track": "production",
+        "releaseStatus": "draft",
+        "applicationId": "com.kaldoo.andingspace"
+      },
       "ios": {
         "ascAppId": "6748913885",
         "appleTeamId": "5D59MAHH43",
