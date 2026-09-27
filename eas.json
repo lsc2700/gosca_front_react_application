@@ -73,11 +73,11 @@
     },
     "production-lchayim-ios": {
       "extends": "production-lchayim",
-      "credentialsSource": "remote"
+      "credentialsSource": "local"
     },
     "production-anding-ios": {
       "extends": "production-anding",
-      "credentialsSource": "remote"
+      "credentialsSource": "local"
     }
   },
   "submit": {
