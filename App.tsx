@@ -4,12 +4,14 @@ import messaging from "@react-native-firebase/messaging";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  AppState,
   BackHandler,
   Dimensions,
   Linking,
   Platform,
   View,
 } from "react-native";
+import { flushWebViewCookies } from "gosca-cookie-flush";
 import WebView from "react-native-webview";
 
 import { ConvertUrl } from "@tosspayments/widget-sdk-react-native/src/utils/convertUrl";
@@ -71,7 +73,7 @@ const url =
   FALLBACK_WEB_URL;
 
 const nativeAppMeta = {
-  version: String(Constants.expoConfig?.version ?? "4.1.7"),
+  version: String(Constants.expoConfig?.version ?? "4.1.10"),
   platform: Platform.OS,
   nativeAd: true,
   bundleId: String(
@@ -148,6 +150,15 @@ export default function App() {
     },
     [reportAd],
   );
+
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "background" || state === "inactive") {
+        flushWebViewCookies();
+      }
+    });
+    return () => sub.remove();
+  }, []);
 
   useEffect(() => {
     let tokenRefreshUnsub: (() => void) | undefined;
@@ -663,11 +674,10 @@ export default function App() {
             });
           }}
           onContentProcessDidTerminate={() => {
-            if (Platform.OS === "android") {
-              webviewRef.current?.reload();
-            }
+            webviewRef.current?.reload();
           }}
           onLoadEnd={() => {
+            flushWebViewCookies();
             injectNativeAppMetaIntoWebView(webviewRef.current, nativeAppMeta);
             injectNativeFcmIntoWebView(
               webviewRef.current,

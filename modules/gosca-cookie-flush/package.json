@@ -1,0 +1,10 @@
+{
+  "name": "gosca-cookie-flush",
+  "version": "1.0.0",
+  "description": "Persist the WebView login cookie before the app process is killed.",
+  "main": "index.ts",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "expo": "*"
+  }
+}
