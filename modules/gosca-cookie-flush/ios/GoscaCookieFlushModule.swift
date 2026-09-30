@@ -7,7 +7,12 @@ public class GoscaCookieFlushModule: Module {
 
     AsyncFunction("flush") { (promise: Promise) in
       DispatchQueue.main.async {
-        WKWebsiteDataStore.default().httpCookieStore.getAllCookies { _ in
+        let store = WKWebsiteDataStore.default().httpCookieStore
+        store.getAllCookies { cookies in
+          let shared = HTTPCookieStorage.shared
+          for cookie in cookies {
+            shared.setCookie(cookie)
+          }
           promise.resolve(nil)
         }
       }

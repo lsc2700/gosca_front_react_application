@@ -3,7 +3,7 @@
     "name": "르하임 스터디카페",
     "slug": "lchayim",
     "owner": "gosca",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "orientation": "portrait",
     "icon": "./assets/lchayim/icon.png",
     "scheme": "lchayim",
@@ -95,12 +95,12 @@
         "NSPhotoLibraryAddUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다."
       },
-      "version": "1.0.10",
+      "version": "1.0.11",
       "buildNumber": "46",
       "bundleIdentifier": "com.kaldoo.lchayim"
     },
     "android": {
-      "version": "1.0.10",
+      "version": "1.0.11",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/lchayim/adaptive-icon.png",

@@ -3,7 +3,7 @@
     "name": "앤딩스페이스",
     "slug": "andingspace",
     "owner": "gosca",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/andingspace/icon.png",
     "scheme": "andingspace",
@@ -95,12 +95,12 @@
         "NSPhotoLibraryAddUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다."
       },
-      "version": "1.0.6",
+      "version": "1.0.7",
       "buildNumber": "44",
       "bundleIdentifier": "com.kaldoo.andingspace"
     },
     "android": {
-      "version": "1.0.6",
+      "version": "1.0.7",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/andingspace/adaptive-icon.png",
