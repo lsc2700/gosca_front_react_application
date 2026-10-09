@@ -58,6 +58,45 @@ export function openNativeStore(): void {
   void Linking.openURL(nativeStoreUrl());
 }
 
+/** 웹이 보낸 스토어 주소 중 이 앱의 스토어 페이지만 허용한다. 다른 앱·사이트로는 보내지 않는다. */
+export function isTrustedStoreUrl(url: unknown): url is string {
+  if (typeof url !== "string" || !url.trim()) return false;
+  const value = url.trim();
+  if (Platform.OS === "ios") {
+    return (
+      (/^itms-apps:\/\/(apps|itunes)\.apple\.com\//i.test(value) ||
+        /^https:\/\/apps\.apple\.com\//i.test(value)) &&
+      value.includes(`id${IOS_APP_ID}`)
+    );
+  }
+  const pkg = Constants.expoConfig?.android?.package ?? GOSCA_ANDROID_PACKAGE;
+  return (
+    (/^market:\/\/details\?/i.test(value) ||
+      /^https:\/\/play\.google\.com\/store\/apps\/details\?/i.test(value)) &&
+    value.includes(`id=${pkg}`)
+  );
+}
+
+/**
+ * 웹뷰의 GOSCA_OPEN_STORE 처리. 웹이 별점 작성 같은 더 정확한 주소를 보내면 그 주소로,
+ * 아니면 기본 스토어 페이지로 연다. 첫 주소가 실패하면 보조 주소를 쓴다.
+ */
+export async function openStoreFromWeb(payload: {
+  url?: unknown;
+  fallbackUrl?: unknown;
+}): Promise<void> {
+  const candidates = [payload.url, payload.fallbackUrl].filter(isTrustedStoreUrl);
+  candidates.push(nativeStoreUrl());
+  for (const candidate of candidates) {
+    try {
+      await Linking.openURL(candidate);
+      return;
+    } catch {
+      /* 다음 주소로 */
+    }
+  }
+}
+
 async function fetchAndroidStoreVersion(): Promise<string | null> {
   try {
     const res = await fetch(

@@ -1,4 +1,6 @@
 export const iosSchemes = [
+  // App Store 별점 작성 (웹의 별점 남기기 → itms-apps://...?action=write-review)
+  "itms-apps://",
   "shinhan-sr-ansimclick://",
   "shinhan-sr-ansimclick-lpay://",
   "shinhan-sr-ansimclick-naverpay://",

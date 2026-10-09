@@ -41,7 +41,7 @@ import { shareReceiptImageFromWebPayload } from "./utils/shareReceiptImageNative
 import { initAdMobAfterTracking } from "./utils/initAdMob";
 import { fetchLocationForNearMe } from "./utils/fetchLocationForNearMe";
 import {
-  nativeStoreUrl,
+  openStoreFromWeb,
   promptStoreUpdateOnLaunch,
 } from "./utils/promptStoreUpdate";
 import Constants from "expo-constants";
@@ -518,7 +518,9 @@ export default function App() {
                 return;
               }
               if (parsed.type === "GOSCA_OPEN_STORE") {
-                void Linking.openURL(nativeStoreUrl());
+                void openStoreFromWeb(
+                  parsed as { url?: unknown; fallbackUrl?: unknown },
+                );
                 return;
               }
               if (parsed.type === "GOSCA_SHARE_RECEIPT_IMAGE") {
