@@ -784,8 +784,8 @@ export default function App() {
         />
         )}
         {webViewNeedsRetry ? (
-          <View
-            pointerEvents="auto"
+          <Pressable
+            onPress={reloadWebView}
             style={{
               position: "absolute",
               left: 0,
@@ -824,7 +824,7 @@ export default function App() {
             >
               <Text style={{ color: "#ffffff", fontSize: 15 }}>새로고침</Text>
             </Pressable>
-          </View>
+          </Pressable>
         ) : null}
         {/* adMobReady 시점에 preload, 완료 화면 메시지로 visible만 켠다 */}
         {adMobReady ? (
