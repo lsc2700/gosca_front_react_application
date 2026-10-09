@@ -9,6 +9,8 @@ import {
   Dimensions,
   Linking,
   Platform,
+  Pressable,
+  Text,
   View,
 } from "react-native";
 import { flushWebViewCookies } from "gosca-cookie-flush";
@@ -44,6 +46,11 @@ import {
   openStoreFromWeb,
   promptStoreUpdateOnLaunch,
 } from "./utils/promptStoreUpdate";
+import {
+  decideWebViewRecovery,
+  rememberWebViewUrl,
+  WEBVIEW_LOAD_WATCH_MS,
+} from "./utils/recoverDeadWebView";
 import Constants from "expo-constants";
 
 interface navType {
@@ -104,6 +111,13 @@ export default function App() {
     url: "",
     canGoBack: false,
   });
+  const currentUriRef = useRef(url);
+  const webViewDeathsRef = useRef<number[]>([]);
+  const recoveringRef = useRef(false);
+  const loadFailedRef = useRef(false);
+  const recoveryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [webViewSession, setWebViewSession] = useState({ key: 0, uri: url });
+  const [webViewNeedsRetry, setWebViewNeedsRetry] = useState(false);
   const [showAdMobBanner, setShowAdMobBanner] = useState(false);
   const [nativeFeed, setNativeFeed] = useState<NativeFeedFrame | null>(null);
   const [adMobReady, setAdMobReady] = useState(false);
@@ -137,6 +151,62 @@ export default function App() {
     },
     [reportAd],
   );
+
+  const clearRecoveryTimer = useCallback(() => {
+    if (recoveryTimerRef.current) {
+      clearTimeout(recoveryTimerRef.current);
+      recoveryTimerRef.current = null;
+    }
+  }, []);
+
+  const showWebViewRetry = useCallback(
+    (reason: string) => {
+      clearRecoveryTimer();
+      recoveringRef.current = false;
+      loadFailedRef.current = true;
+      setWebViewNeedsRetry(true);
+      console.warn("[gosca] webview retry", reason);
+    },
+    [clearRecoveryTimer],
+  );
+
+  const armLoadWatch = useCallback(() => {
+    clearRecoveryTimer();
+    recoveryTimerRef.current = setTimeout(() => {
+      showWebViewRetry("load timed out");
+    }, WEBVIEW_LOAD_WATCH_MS);
+  }, [clearRecoveryTimer, showWebViewRetry]);
+
+  const reloadWebView = useCallback(() => {
+    webViewDeathsRef.current = [];
+    loadFailedRef.current = false;
+    recoveringRef.current = true;
+    setShowAdMobBanner(false);
+    setNativeFeed(null);
+    setWebViewNeedsRetry(false);
+    const nextUri = currentUriRef.current || url;
+    console.warn("[gosca] webview refresh", nextUri);
+    setWebViewSession((prev) => ({ key: prev.key + 1, uri: nextUri }));
+    armLoadWatch();
+  }, [armLoadWatch]);
+
+  const recoverDeadWebView = useCallback(() => {
+    const decision = decideWebViewRecovery(webViewDeathsRef.current, Date.now());
+    webViewDeathsRef.current = decision.deaths;
+    if (decision.action === "wait") {
+      showWebViewRetry("renderer gone repeatedly");
+      return;
+    }
+    setShowAdMobBanner(false);
+    setNativeFeed(null);
+    setWebViewNeedsRetry(false);
+    loadFailedRef.current = false;
+    recoveringRef.current = true;
+    const nextUri = currentUriRef.current || url;
+    console.warn("[gosca] webview renderer gone, remount", nextUri);
+    setWebViewSession((prev) => ({ key: prev.key + 1, uri: nextUri }));
+    armLoadWatch();
+  }, [armLoadWatch, showWebViewRetry]);
 
   const onBannerStatus = useCallback(
     (status: AdLoadStatus) => {
@@ -477,9 +547,11 @@ export default function App() {
       }}
     >
       <View style={{ flex: 1 }}>
+        {webViewNeedsRetry ? null : (
         <WebView
+          key={webViewSession.key}
           ref={webviewRef}
-          source={{ uri: url }}
+          source={{ uri: webViewSession.uri }}
           style={{ flex: 1 }}
           javaScriptEnabled={true}
           domStorageEnabled={true}
@@ -655,9 +727,14 @@ export default function App() {
               /* noop */
             }
           }}
+          onLoadStart={() => {
+            loadFailedRef.current = false;
+            armLoadWatch();
+          }}
           onError={(syntheticEvent) => {
             const { nativeEvent } = syntheticEvent;
             console.warn("WebView error: ", nativeEvent);
+            showWebViewRetry(String(nativeEvent.description ?? "load error"));
           }}
           // injectedJavaScript={`
           //   document.addEventListener('DOMContentLoaded', () => {
@@ -667,6 +744,10 @@ export default function App() {
           //   });
           // `}
           onNavigationStateChange={(nav: navType) => {
+            currentUriRef.current = rememberWebViewUrl(
+              currentUriRef.current,
+              nav.url,
+            );
             setNavState((prev) => {
               if (prev.url !== nav.url) {
                 setShowAdMobBanner(false);
@@ -676,9 +757,23 @@ export default function App() {
             });
           }}
           onContentProcessDidTerminate={() => {
-            webviewRef.current?.reload();
+            recoverDeadWebView();
           }}
-          onLoadEnd={() => {
+          onRenderProcessGone={() => {
+            recoverDeadWebView();
+          }}
+          onLoadEnd={(event) => {
+            clearRecoveryTimer();
+            const description = (
+              event.nativeEvent as { description?: string }
+            ).description;
+            if (loadFailedRef.current && description) return;
+            loadFailedRef.current = false;
+            if (recoveringRef.current) {
+              recoveringRef.current = false;
+              console.warn("[gosca] webview recovered");
+            }
+            setWebViewNeedsRetry(false);
             flushWebViewCookies();
             injectNativeAppMetaIntoWebView(webviewRef.current, nativeAppMeta);
             injectNativeFcmIntoWebView(
@@ -687,6 +782,50 @@ export default function App() {
             );
           }}
         />
+        )}
+        {webViewNeedsRetry ? (
+          <View
+            pointerEvents="auto"
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#ffffff",
+              padding: 24,
+              zIndex: 20,
+              elevation: 24,
+            }}
+          >
+            <Text style={{ fontSize: 16, color: "#222222", marginBottom: 8 }}>
+              화면을 불러오지 못했습니다
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: "#666666",
+                marginBottom: 16,
+                textAlign: "center",
+              }}
+            >
+              연결이 불안정하면 새로고침해 주세요
+            </Text>
+            <Pressable
+              onPress={reloadWebView}
+              style={{
+                backgroundColor: "#111111",
+                borderRadius: 8,
+                paddingHorizontal: 20,
+                paddingVertical: 12,
+              }}
+            >
+              <Text style={{ color: "#ffffff", fontSize: 15 }}>새로고침</Text>
+            </Pressable>
+          </View>
+        ) : null}
         {/* adMobReady 시점에 preload, 완료 화면 메시지로 visible만 켠다 */}
         {adMobReady ? (
           <GoscaAdMobBanner visible={showAdMobBanner} onStatus={onBannerStatus} />
