@@ -94,7 +94,8 @@
       "android": {
         "track": "production",
         "releaseStatus": "draft",
-        "applicationId": "com.user.gosca"
+        "applicationId": "com.user.gosca",
+        "serviceAccountKeyPath": "C:/Users/sclee/Documents/GitHub/gosca-admin-back/local-play/gosca-play-submit.json"
       },
       "ios": {
         "ascAppId": "1505155896",
