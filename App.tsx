@@ -36,7 +36,11 @@ import {
   setupAppNotifications,
 } from "./utils/setupNotifications";
 import { GoscaAdMobBanner } from "./utils/GoscaAdMobBanner";
-import { GoscaAdMobNative, type NativeFeedFrame } from "./utils/GoscaAdMobNative";
+import {
+  GoscaAdMobNative,
+  type NativeAdController,
+  type NativeFeedFrame,
+} from "./utils/GoscaAdMobNative";
 import { shareReceiptImageFromWebPayload } from "./utils/shareReceiptImageNative";
 import { initAdMobAfterTracking } from "./utils/initAdMob";
 import { fetchLocationForNearMe } from "./utils/fetchLocationForNearMe";
@@ -121,7 +125,14 @@ export default function App() {
   const recoveryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [webViewSession, setWebViewSession] = useState({ key: 0, uri: url });
   const [showAdMobBanner, setShowAdMobBanner] = useState(false);
-  const [nativeFeed, setNativeFeed] = useState<NativeFeedFrame | null>(null);
+  const nativeAdRef = useRef<NativeAdController>(null);
+  const placeNativeAd = useCallback((frame: NativeFeedFrame | null) => {
+    try {
+      nativeAdRef.current?.place(frame);
+    } catch {
+      /* 광고 뷰 실패가 웹뷰 입력을 막지 않게 무시한다. */
+    }
+  }, []);
   const [adMobReady, setAdMobReady] = useState(false);
   type AdLoadStatus = "loading" | "ok" | "fail";
   const nativeStatusRef = useRef<AdLoadStatus>("loading");
@@ -148,10 +159,10 @@ export default function App() {
       reportAd("native", status === "ok", slot);
       if (status === "fail") {
         nativeAskedSlotRef.current = null;
-        setNativeFeed(null);
+        placeNativeAd(null);
       }
     },
-    [reportAd],
+    [placeNativeAd, reportAd],
   );
 
   const clearRecoveryTimer = useCallback(() => {
@@ -165,7 +176,7 @@ export default function App() {
     (reason: string) => {
       clearRecoveryTimer();
       setShowAdMobBanner(false);
-      setNativeFeed(null);
+      placeNativeAd(null);
       loadFailedRef.current = false;
       pageShownRef.current = false;
       recoveringRef.current = true;
@@ -173,7 +184,7 @@ export default function App() {
       console.warn("[gosca] remount webview", reason, nextUri);
       setWebViewSession((prev) => ({ key: prev.key + 1, uri: nextUri }));
     },
-    [clearRecoveryTimer, url],
+    [clearRecoveryTimer, placeNativeAd, url],
   );
 
   const keepOrReloadQuietly = useCallback(
@@ -664,18 +675,18 @@ export default function App() {
                     nativeAskedSlotRef.current = null;
                     nativeReportedRef.current = false;
                   }
-                  setNativeFeed((prev) => (prev?.slot === p.slot ? null : prev));
+                  placeNativeAd(null);
                   return;
                 }
                 nativeAskedSlotRef.current = p.slot;
                 if (nativeStatusRef.current === "fail") {
                   nativeAskedSlotRef.current = null;
                   nativeReportedRef.current = false;
-                  setNativeFeed(null);
+                  placeNativeAd(null);
                   reportAd("native", false, p.slot);
                   return;
                 }
-                setNativeFeed({
+                placeNativeAd({
                   slot: p.slot,
                   x: Number(p.x) || 0,
                   y: Number(p.y) || 0,
@@ -772,7 +783,7 @@ export default function App() {
             setNavState((prev) => {
               if (prev.url !== nav.url) {
                 setShowAdMobBanner(false);
-                setNativeFeed(null);
+                placeNativeAd(null);
               }
               return { url: nav.url, canGoBack: nav.canGoBack };
             });
@@ -808,7 +819,9 @@ export default function App() {
         {adMobReady ? (
           <GoscaAdMobBanner visible={showAdMobBanner} onStatus={onBannerStatus} />
         ) : null}
-        {adMobReady ? <GoscaAdMobNative frame={nativeFeed} onStatus={onNativeStatus} /> : null}
+        {adMobReady ? (
+          <GoscaAdMobNative ref={nativeAdRef} onStatus={onNativeStatus} />
+        ) : null}
       </View>
     </SafeAreaView>
   );
