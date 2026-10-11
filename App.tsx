@@ -671,6 +671,13 @@ export default function App() {
                   height?: number;
                 };
                 if (p.visible !== true || !p.slot) {
+                  if (
+                    p.slot &&
+                    nativeAskedSlotRef.current &&
+                    nativeAskedSlotRef.current !== p.slot
+                  ) {
+                    return;
+                  }
                   if (nativeAskedSlotRef.current === p.slot) {
                     nativeAskedSlotRef.current = null;
                     nativeReportedRef.current = false;
