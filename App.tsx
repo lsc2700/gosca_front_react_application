@@ -10,6 +10,8 @@ import {
   Linking,
   NativeModules,
   Platform,
+  Pressable,
+  Text,
   View,
 } from "react-native";
 import { flushWebViewCookies } from "gosca-cookie-flush";
@@ -94,6 +96,17 @@ const url =
     : (Constants.expoConfig?.extra as { webUrl?: string } | undefined)?.webUrl ||
       FALLBACK_WEB_URL;
 
+/** 아이폰은 앱을 꺼도 웹 화면 캐시가 남는다. 주소를 바꿔 최신 묶음을 받게 한다. */
+function withReloadToken(href: string): string {
+  try {
+    const next = new URL(href);
+    next.searchParams.set("_gosca_reload", String(Date.now()));
+    return next.toString();
+  } catch {
+    return href;
+  }
+}
+
 const nativeAppMeta = {
   version: String(Constants.expoConfig?.version ?? "4.1.10"),
   platform: Platform.OS,
@@ -138,7 +151,15 @@ export default function App() {
   const pageShownRef = useRef(false);
   const quietReloadsRef = useRef(0);
   const recoveryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [webViewSession, setWebViewSession] = useState({ key: 0, uri: url });
+  const [webViewSession, setWebViewSession] = useState(() => ({
+    key: 0,
+    uri: Platform.OS === "ios" ? withReloadToken(url) : url,
+  }));
+  const reloadFreshWeb = useCallback(() => {
+    const next = withReloadToken(currentUriRef.current || url);
+    currentUriRef.current = next;
+    setWebViewSession((prev) => ({ key: prev.key + 1, uri: next }));
+  }, []);
   useEffect(() => {
     const openNfcLink = (incoming: string | null) => {
       if (!incoming) return;
@@ -610,6 +631,21 @@ export default function App() {
         height: deviceHeight,
       }}
     >
+      {Platform.OS === "ios" ? (
+        <Pressable
+          onPress={reloadFreshWeb}
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            paddingVertical: 8,
+            backgroundColor: "#111827",
+          }}
+        >
+          <Text style={{ color: "#ffffff", fontSize: 15, fontWeight: "700" }}>
+            새로고침
+          </Text>
+        </Pressable>
+      ) : null}
       <View style={{ flex: 1 }}>
         <WebView
           key={webViewSession.key}
@@ -637,6 +673,7 @@ export default function App() {
           allowsBackForwardNavigationGestures
           onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
           mixedContentMode="always"
+          cacheEnabled={Platform.OS !== "ios"}
           sharedCookiesEnabled={true}
           thirdPartyCookiesEnabled={true}
           mediaPlaybackRequiresUserAction={false}
@@ -660,6 +697,10 @@ export default function App() {
                   write: prepareNfcWrite,
                 })
               ) {
+                return;
+              }
+              if (parsed.type === "GOSCA_HARD_RELOAD") {
+                reloadFreshWeb();
                 return;
               }
               if (parsed.type === "GOSCA_SYNC_URL") {
