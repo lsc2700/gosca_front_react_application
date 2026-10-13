@@ -8,6 +8,7 @@ import {
   BackHandler,
   Dimensions,
   Linking,
+  NativeModules,
   Platform,
   View,
 } from "react-native";
@@ -57,6 +58,8 @@ import {
   WEBVIEW_RECOVERY_WINDOW_MS,
 } from "./utils/recoverDeadWebView";
 import Constants from "expo-constants";
+import { handleNfcWebMessage } from "./utils/nfcTagToken";
+import { ensureNfcEnabled, injectNfcToWeb, prepareNfcScan, prepareNfcWrite, releaseNfc, subscribeGoscaNfc } from "./utils/goscaNfc";
 
 interface navType {
   url: string;
@@ -80,9 +83,16 @@ interface navType {
 // }
 
 const FALLBACK_WEB_URL = "https://apis.gosca.co.kr/login/gosca";
+/** USB 디버그 앱만 로컬 프론트. adb reverse tcp:3000 tcp:3000 이 있어야 폰의 localhost가 PC다. */
+const USB_DEBUG_WEB_URL = "http://localhost:3000/login/gosca";
+const usbLocal =
+  (NativeModules.GoscaNfc as { usbLocal?: boolean } | undefined)?.usbLocal ===
+  true;
 const url =
-  (Constants.expoConfig?.extra as { webUrl?: string } | undefined)?.webUrl ||
-  FALLBACK_WEB_URL;
+  __DEV__ || usbLocal
+    ? USB_DEBUG_WEB_URL
+    : (Constants.expoConfig?.extra as { webUrl?: string } | undefined)?.webUrl ||
+      FALLBACK_WEB_URL;
 
 const nativeAppMeta = {
   version: String(Constants.expoConfig?.version ?? "4.1.10"),
@@ -99,6 +109,11 @@ export default function App() {
   const deviceHeight = Dimensions.get("window").height;
   const deviceWidth = Dimensions.get("window").width;
   const webviewRef = useRef<WebView>(null);
+  useEffect(() => {
+    return subscribeGoscaNfc((event) => {
+      injectNfcToWeb(webviewRef.current, event);
+    });
+  }, []);
   const devicePushTokenRef = useRef<string | null>(null);
   // const [location, setLocation] = useState<locationData>({
   //   platform: Platform.OS,
@@ -124,6 +139,35 @@ export default function App() {
   const quietReloadsRef = useRef(0);
   const recoveryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [webViewSession, setWebViewSession] = useState({ key: 0, uri: url });
+  useEffect(() => {
+    const openNfcLink = (incoming: string | null) => {
+      if (!incoming) return;
+      const matched = incoming.match(/\/nfc\/([^/?#]+)/);
+      if (!matched) return;
+      let token = matched[1];
+      try {
+        token = decodeURIComponent(token);
+      } catch {
+        /* 토큰 그대로 연다 */
+      }
+      const origin =
+        __DEV__ || usbLocal ? "http://localhost:3000" : "https://apis.gosca.co.kr";
+      const next = `${origin}/nfc/${encodeURIComponent(token)}`;
+      if (pageShownRef.current && webviewRef.current) {
+        injectNfcToWeb(webviewRef.current, { action: "tag", url: next });
+        return;
+      }
+      currentUriRef.current = next;
+      setWebViewSession((prev) =>
+        prev.uri === next ? prev : { key: prev.key + 1, uri: next },
+      );
+    };
+    void Linking.getInitialURL().then(openNfcLink);
+    const sub = Linking.addEventListener("url", ({ url: incoming }) =>
+      openNfcLink(incoming),
+    );
+    return () => sub.remove();
+  }, []);
   const [showAdMobBanner, setShowAdMobBanner] = useState(false);
   const nativeAdRef = useRef<NativeAdController>(null);
   const placeNativeAd = useCallback((frame: NativeFeedFrame | null) => {
@@ -606,6 +650,23 @@ export default function App() {
               try {
                 parsed = JSON.parse(raw) as { type?: string };
               } catch {
+                return;
+              }
+              if (
+                handleNfcWebMessage(parsed, {
+                  ensure: ensureNfcEnabled,
+                  release: releaseNfc,
+                  scan: prepareNfcScan,
+                  write: prepareNfcWrite,
+                })
+              ) {
+                return;
+              }
+              if (parsed.type === "GOSCA_SYNC_URL") {
+                const url = (parsed as { url?: unknown }).url;
+                if (typeof url === "string" && url.startsWith("http")) {
+                  currentUriRef.current = url;
+                }
                 return;
               }
               if (parsed.type === "GOSCA_OPEN_STORE") {

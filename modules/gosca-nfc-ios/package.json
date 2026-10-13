@@ -1,0 +1,10 @@
+{
+  "name": "gosca-nfc-ios",
+  "version": "1.0.0",
+  "description": "아이폰이 켜져 있을 때 입실 스티커의 NDEF 주소를 읽는다.",
+  "main": "index.ts",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "expo": "*"
+  }
+}

@@ -19,4 +19,11 @@ if (
   config.expo.android.versionCode = 62;
 }
 
-module.exports = config;
+const withIosNfc = require("./plugins/withIosNfc");
+
+const webUrl = process.env.GOSCA_WEB_URL;
+if (webUrl && config.expo && config.expo.extra) {
+  config.expo.extra.webUrl = webUrl;
+}
+
+module.exports = withIosNfc(config);

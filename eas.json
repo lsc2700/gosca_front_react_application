@@ -10,6 +10,21 @@
       },
       "distribution": "internal"
     },
+    "ios-gosca1": {
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "gosca",
+        "GOSCA_WEB_URL": "https://apis.gosca-1.co.kr/login/gosca"
+      }
+    },
+    "ios-gosca1-testflight": {
+      "credentialsSource": "local",
+      "autoIncrement": true,
+      "env": {
+        "APP_VARIANT": "gosca",
+        "GOSCA_WEB_URL": "https://apis.gosca-1.co.kr/login/gosca"
+      }
+    },
     "preview": {
       "distribution": "internal",
       "android": {

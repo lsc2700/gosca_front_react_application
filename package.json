@@ -40,6 +40,7 @@
     "expo-tracking-transparency": "~6.0.8",
     "expo-web-browser": "~15.0.9",
     "gosca-cookie-flush": "file:modules/gosca-cookie-flush",
+    "gosca-nfc-ios": "file:modules/gosca-nfc-ios",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
