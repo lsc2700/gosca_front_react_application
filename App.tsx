@@ -124,6 +124,7 @@ export default function App() {
   const webviewRef = useRef<WebView>(null);
   useEffect(() => {
     return subscribeGoscaNfc((event) => {
+      if (event.action === "scan-unsupported") return;
       injectNfcToWeb(webviewRef.current, event);
     });
   }, []);
@@ -693,7 +694,14 @@ export default function App() {
                 handleNfcWebMessage(parsed, {
                   ensure: ensureNfcEnabled,
                   release: releaseNfc,
-                  scan: prepareNfcScan,
+                  scan: () => {
+                    if (!prepareNfcScan()) {
+                      Alert.alert(
+                        "NFC",
+                        "이 앱에서 아이폰 NFC를 열지 못했습니다. TestFlight에서 최신 빌드로 업데이트해 주세요.",
+                      );
+                    }
+                  },
                   write: prepareNfcWrite,
                 })
               ) {

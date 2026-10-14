@@ -1,5 +1,6 @@
 import CoreNFC
 import ExpoModulesCore
+import UIKit
 
 /** 앱이 앞에 있을 때 입실 스티커 주소를 읽는다. 아이폰은 이 세션이 있어야 태그를 앱으로 넘긴다. */
 public class GoscaNfcIosModule: Module {
@@ -9,20 +10,21 @@ public class GoscaNfcIosModule: Module {
     Name("GoscaNfcIos")
     Events("onTag")
 
-    Function("ensureEnabled") {
-      self.reader.start { action, url in
-        self.emit(action, url)
-      }
+    AsyncFunction("ensureEnabled") { (promise: Promise) in
+      // 지점 진입만으로 세션을 열면 버튼이 무시된다. 시트는 버튼을 누를 때만 연다.
+      promise.resolve(nil)
     }
 
-    Function("release") {
+    AsyncFunction("release") { (promise: Promise) in
       self.reader.stop()
+      promise.resolve(nil)
     }
 
-    Function("prepareScan") {
+    AsyncFunction("prepareScan") { (promise: Promise) in
       self.reader.start { action, url in
         self.emit(action, url)
       }
+      promise.resolve(nil)
     }
 
     Function("prepareWrite") { (url: String) in
@@ -101,17 +103,36 @@ private final class GoscaNfcReader: NSObject, NFCNDEFReaderSessionDelegate {
   }
 
   private func beginSession() {
-    DispatchQueue.main.async {
+    let open = {
       guard NFCNDEFReaderSession.readingAvailable else {
         self.onEvent?("scan-unsupported", nil)
+        self.presentUnavailable()
         return
       }
-      if self.session != nil { return }
+      let previous = self.session
+      self.session = nil
+      previous?.invalidate()
       let next = NFCNDEFReaderSession(delegate: self, queue: nil, invalidateAfterFirstRead: false)
       next.alertMessage = "입실·퇴실 스티커에 아이폰을 대 주세요"
       self.session = next
       next.begin()
     }
+    if Thread.isMainThread {
+      open()
+    } else {
+      DispatchQueue.main.async(execute: open)
+    }
+  }
+
+  private func presentUnavailable() {
+    let alert = UIAlertController(
+      title: "NFC",
+      message: "이 아이폰에서는 스티커 읽기를 시작할 수 없습니다.",
+      preferredStyle: .alert
+    )
+    alert.addAction(UIAlertAction(title: "확인", style: .default))
+    let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+    scene?.windows.first { $0.isKeyWindow }?.rootViewController?.present(alert, animated: true)
   }
 
   func readerSession(_ session: NFCNDEFReaderSession, didDetectNDEFs messages: [NFCNDEFMessage]) {
@@ -145,15 +166,12 @@ private final class GoscaNfcReader: NSObject, NFCNDEFReaderSessionDelegate {
   }
 
   func readerSession(_ session: NFCNDEFReaderSession, didInvalidateWithError error: Error) {
+    guard session === self.session else { return }
     if stopped { return }
-    let again = readOk || keepReading || (error as NSError).code == 201
     readOk = false
     keepReading = false
     self.session = nil
-    if !again { return }
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-      self.beginSession()
-    }
+    _ = error
   }
 
   private func deliver(_ url: String, session: NFCNDEFReaderSession) {

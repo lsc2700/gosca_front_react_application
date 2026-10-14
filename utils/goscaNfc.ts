@@ -35,12 +35,17 @@ export function subscribeGoscaNfc(onEvent: (event: GoscaNfcEvent) => void): () =
   return () => {};
 }
 
-export function prepareNfcScan(): void {
+export function prepareNfcScan(): boolean {
   if (Platform.OS === "ios") {
-    iosNfc()?.prepareScan?.();
-    return;
+    const native = iosNfc();
+    if (typeof native?.prepareScan !== "function") return false;
+    native.prepareScan();
+    return true;
   }
-  NativeModules.GoscaNfc?.prepareScan?.();
+  const android = NativeModules.GoscaNfc;
+  if (typeof android?.prepareScan !== "function") return false;
+  android.prepareScan();
+  return true;
 }
 
 export function ensureNfcEnabled(): void {
