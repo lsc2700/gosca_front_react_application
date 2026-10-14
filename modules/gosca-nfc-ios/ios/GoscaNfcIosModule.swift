@@ -127,7 +127,7 @@ private final class GoscaNfcReader: NSObject, NFCNDEFReaderSessionDelegate {
   private func presentUnavailable() {
     let alert = UIAlertController(
       title: "NFC",
-      message: "스티커 읽기 화면을 열지 못했습니다. TestFlight 최신 빌드인지 확인해 주세요.",
+      message: "스티커 읽기 화면을 열지 못했습니다.",
       preferredStyle: .alert
     )
     alert.addAction(UIAlertAction(title: "확인", style: .default))

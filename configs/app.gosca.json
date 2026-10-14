@@ -97,6 +97,9 @@
         "NSPhotoLibraryUsageDescription": "영수증 이미지를 사진 앱에 저장하기 위해 필요합니다.",
         "NFCReaderUsageDescription": "입실·퇴실 스티커를 읽기 위해 NFC를 사용합니다."
       },
+      "entitlements": {
+        "com.apple.developer.nfc.readersession.formats": ["TAG"]
+      },
       "version": "4.1.15",
       "buildNumber": "43",
       "bundleIdentifier": "com.gosca.users"

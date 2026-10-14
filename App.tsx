@@ -3,6 +3,7 @@
 import messaging from "@react-native-firebase/messaging";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   AppState,
   BackHandler,
@@ -96,7 +97,7 @@ const url =
     : (Constants.expoConfig?.extra as { webUrl?: string } | undefined)?.webUrl ||
       FALLBACK_WEB_URL;
 
-/** 아이폰은 앱을 꺼도 웹 화면 캐시가 남는다. 주소를 바꿔 최신 묶음을 받게 한다. */
+/** 새로고침할 때만 주소를 바꿔 캐시된 화면 대신 최신 묶음을 받게 한다. */
 function withReloadToken(href: string): string {
   try {
     const next = new URL(href);
@@ -154,11 +155,14 @@ export default function App() {
   const recoveryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [webViewSession, setWebViewSession] = useState(() => ({
     key: 0,
-    uri: Platform.OS === "ios" ? withReloadToken(url) : url,
+    uri: url,
   }));
+  const [bootSplash, setBootSplash] = useState(true);
   const reloadFreshWeb = useCallback(() => {
     const next = withReloadToken(currentUriRef.current || url);
     currentUriRef.current = next;
+    pageShownRef.current = false;
+    setBootSplash(true);
     setWebViewSession((prev) => ({ key: prev.key + 1, uri: next }));
   }, []);
   useEffect(() => {
@@ -245,6 +249,7 @@ export default function App() {
       placeNativeAd(null);
       loadFailedRef.current = false;
       pageShownRef.current = false;
+      setBootSplash(true);
       recoveringRef.current = true;
       const nextUri = currentUriRef.current || url;
       console.warn("[gosca] remount webview", reason, nextUri);
@@ -647,12 +652,12 @@ export default function App() {
           </Text>
         </Pressable>
       ) : null}
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: "#0E50C3" }}>
         <WebView
           key={webViewSession.key}
           ref={webviewRef}
           source={{ uri: webViewSession.uri }}
-          style={{ flex: 1 }}
+          style={{ flex: 1, backgroundColor: "#0E50C3" }}
           javaScriptEnabled={true}
           domStorageEnabled={true}
           originWhitelist={["*"]}
@@ -674,7 +679,7 @@ export default function App() {
           allowsBackForwardNavigationGestures
           onShouldStartLoadWithRequest={handleShouldStartLoadWithRequest}
           mixedContentMode="always"
-          cacheEnabled={Platform.OS !== "ios"}
+          cacheEnabled={true}
           sharedCookiesEnabled={true}
           thirdPartyCookiesEnabled={true}
           mediaPlaybackRequiresUserAction={false}
@@ -696,10 +701,7 @@ export default function App() {
                   release: releaseNfc,
                   scan: () => {
                     if (!prepareNfcScan()) {
-                      Alert.alert(
-                        "NFC",
-                        "이 앱에서 아이폰 NFC를 열지 못했습니다. TestFlight에서 최신 빌드로 업데이트해 주세요.",
-                      );
+                      Alert.alert("NFC", "아이폰 NFC 모듈을 찾지 못했습니다.");
                     }
                   },
                   write: prepareNfcWrite,
@@ -865,6 +867,7 @@ export default function App() {
           }}
           onLoadStart={() => {
             loadFailedRef.current = false;
+            if (!pageShownRef.current) setBootSplash(true);
             armLoadWatch();
           }}
           onLoadProgress={({ nativeEvent }) => {
@@ -883,6 +886,7 @@ export default function App() {
               console.warn("[gosca] cancelled load ignored");
               return;
             }
+            setBootSplash(false);
             keepOrReloadQuietly(String(nativeEvent.description ?? "load error"));
           }}
           // injectedJavaScript={`
@@ -924,6 +928,7 @@ export default function App() {
               recoveringRef.current = false;
               console.warn("[gosca] webview recovered");
             }
+            setBootSplash(false);
             flushWebViewCookies();
             injectNativeAppMetaIntoWebView(webviewRef.current, nativeAppMeta);
             injectNativeFcmIntoWebView(
@@ -938,6 +943,54 @@ export default function App() {
         ) : null}
         {adMobReady ? (
           <GoscaAdMobNative ref={nativeAdRef} onStatus={onNativeStatus} />
+        ) : null}
+        {bootSplash ? (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: 0,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#0E50C3",
+            }}
+          >
+            <View
+              style={{
+                width: 88,
+                height: 88,
+                borderRadius: 44,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(255,255,255,0.16)",
+              }}
+            >
+              <ActivityIndicator size="large" color="#ffffff" />
+            </View>
+            <Text
+              style={{
+                marginTop: 22,
+                color: "#ffffff",
+                fontSize: 18,
+                fontWeight: "600",
+                letterSpacing: -0.2,
+              }}
+            >
+              실행 중이에요
+            </Text>
+            <Text
+              style={{
+                marginTop: 8,
+                color: "rgba(255,255,255,0.78)",
+                fontSize: 14,
+                fontWeight: "400",
+              }}
+            >
+              잠시만 기다려 주세요
+            </Text>
+          </View>
         ) : null}
       </View>
     </SafeAreaView>
