@@ -113,7 +113,7 @@ private final class GoscaNfcReader: NSObject, NFCNDEFReaderSessionDelegate {
       self.session = nil
       previous?.invalidate()
       let next = NFCNDEFReaderSession(delegate: self, queue: nil, invalidateAfterFirstRead: false)
-      next.alertMessage = "입실·퇴실 스티커에 아이폰을 대 주세요"
+      next.alertMessage = "아이폰 위쪽을 스티커에 대 주세요"
       self.session = next
       next.begin()
     }
