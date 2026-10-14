@@ -9,7 +9,7 @@ function withIosNfc(config) {
     return next;
   });
   config = withEntitlementsPlist(config, (next) => {
-    next.modResults["com.apple.developer.nfc.readersession.formats"] = ["NDEF"];
+    next.modResults["com.apple.developer.nfc.readersession.formats"] = ["TAG"];
     return next;
   });
   return config;

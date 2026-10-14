@@ -57,6 +57,9 @@ test("아이폰 URI 레코드의 4번은 https 접두다", () => {
     (match) => match[1],
   );
   assert.equal(items[4], "https://");
+  const plugin = fs.readFileSync("plugins/withIosNfc.js", "utf8");
+  assert.ok(plugin.includes('"TAG"'));
+  assert.equal(plugin.includes('"NDEF"'), false);
   assert.ok(swift.includes("NFCNDEFReaderSession"));
   assert.ok(swift.includes('onEvent?("tag", url)'));
   assert.ok(swift.includes("session?.invalidate()"));
